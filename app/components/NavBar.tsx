@@ -29,7 +29,7 @@ export default function Navbar() {
                   : item === "Services"
                   ? "/services"
                   : item === "Careers"
-                  ? "/content"
+                  ? "/careers"
                   : item === "Contact"
                   ? "/contact"
                   : item === "Portfolio"
