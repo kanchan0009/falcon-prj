@@ -32,13 +32,14 @@ export default function FalconTechAbout() {
       .querySelectorAll(".sr, .sr-l, .sr-r")
       .forEach((el) => io.observe(el));
 
-    // Skill bars
     const barIo = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            e.target.querySelectorAll(".skill-bar-fill").forEach((bar) => {
-              bar.style.width = bar.dataset.w;
+            const targetEl = e.target as HTMLElement; // cast target
+            targetEl.querySelectorAll(".skill-bar-fill").forEach((bar) => {
+              const htmlBar = bar as HTMLElement;
+              htmlBar.style.width = htmlBar.dataset.w || "0";
             });
             barIo.unobserve(e.target);
           }
@@ -46,25 +47,25 @@ export default function FalconTechAbout() {
       },
       { threshold: 0.3 },
     );
-
-    const skillSection = document.querySelector(".skill-bars");
-    if (skillSection) barIo.observe(skillSection);
-
     // Stat counters
     const statIo = new IntersectionObserver(
       (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
             const targets = {
               projects: 3,
               team: 200,
               customers: 350,
               years: 16,
-            };
-            Object.keys(targets).forEach((key) => {
-              animateCount(key, targets[key]);
-            });
-            statIo.unobserve(e.target);
+            } as const; // make keys literal types
+
+            (Object.keys(targets) as Array<keyof typeof targets>).forEach(
+              (key) => {
+                animateCount(key, targets[key]);
+              },
+            );
+
+            statIo.unobserve(entry.target as Element); // ✅ cast to Element
           }
         });
       },
@@ -77,7 +78,7 @@ export default function FalconTechAbout() {
     // Parallax
     const handleScroll = () => {
       const s = window.scrollY;
-      const dots = document.querySelector(".hero-dots");
+      const dots = document.querySelector(".hero-dots") as HTMLElement | null;
       if (dots && s < window.innerHeight) {
         dots.style.transform = `translateY(${s * 0.08}px)`;
       }
@@ -93,21 +94,25 @@ export default function FalconTechAbout() {
     };
   }, []);
 
-  const animateCount = (key, target) => {
+  type CountKeys = "projects" | "team" | "customers" | "years";
+
+  const animateCount = (key: CountKeys, target: number) => {
     let current = 0;
     const step = Math.max(1, target / 50);
+
     const t = setInterval(() => {
       current = Math.min(current + step, target);
-      setCounts((prev) => ({ ...prev, [key]: Math.floor(current) }));
+
+      setCounts((prev) => ({
+        ...prev,
+        [key]: Math.floor(current),
+      }));
+
       if (current >= target) {
         setCounts((prev) => ({ ...prev, [key]: target }));
         clearInterval(t);
       }
     }, 28);
-  };
-
-  const toggleFaq = (index) => {
-    setOpenFaq(openFaq === index ? null : index);
   };
 
   const services = [
@@ -1144,10 +1149,7 @@ export default function FalconTechAbout() {
                 key={i}
                 className={`faq-item border-b border-[#e2e8f0] overflow-hidden ${i === 0 ? "border-t" : ""} ${openFaq === i ? "open" : ""}`}
               >
-                <div
-                  className="flex justify-between items-center py-5 gap-5 cursor-pointer text-[15px] font-semibold text-[#0d1b3e] transition-colors duration-300 hover:text-[#f97316]"
-                  onClick={() => toggleFaq(i)}
-                >
+                <div className="flex justify-between items-center py-5 gap-5 cursor-pointer text-[15px] font-semibold text-[#0d1b3e] transition-colors duration-300 hover:text-[#f97316]">
                   {faq.q}
                   <div
                     className={`w-[30px] h-[30px] rounded-full border-[1.5px] border-[#e2e8f0] flex items-center justify-center text-[15px] text-[#64748b] flex-shrink-0 transition-all duration-[0.35s] ease-[cubic-bezier(0.16,1,0.3,1)] ${openFaq === i ? "bg-[#f97316] border-[#f97316] text-white rotate-45" : ""}`}
