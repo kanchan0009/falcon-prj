@@ -12,7 +12,6 @@ export default function Navbar() {
   return (
     <nav className="w-full bg-white shadow-md relative z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        
         {/* LOGO */}
         <Link
           href="/"
@@ -30,14 +29,14 @@ export default function Navbar() {
                 item === "About"
                   ? "/about"
                   : item === "Services"
-                  ? "/services"
-                  : item === "Careers"
-                  ? "/careers"
-                  : item === "Contact"
-                  ? "/contact"
-                  : item === "Portfolio"
-                  ? "/portfolio"
-                  : "/"
+                    ? "/services"
+                    : item === "Careers"
+                      ? "/careers"
+                      : item === "Contact"
+                        ? "/contact"
+                        : item === "Portfolio"
+                          ? "/portfolio"
+                          : "/"
               }
               className="text-[#0B1F3A] font-medium hover:text-[#F97316] transition"
             >
@@ -76,14 +75,14 @@ export default function Navbar() {
                   item === "About"
                     ? "/about"
                     : item === "Services"
-                    ? "/services"
-                    : item === "Careers"
-                    ? "/careers"
-                    : item === "Contact"
-                    ? "/contact"
-                    : item === "Portfolio"
-                    ? "/portfolio"
-                    : "/"
+                      ? "/services"
+                      : item === "Careers"
+                        ? "/careers"
+                        : item === "Contact"
+                          ? "/contact"
+                          : item === "Portfolio"
+                            ? "/portfolio"
+                            : "/"
                 }
                 className="text-[#0B1F3A] font-medium hover:text-[#F97316] transition"
                 onClick={() => setMenuOpen(false)}

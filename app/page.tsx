@@ -196,7 +196,6 @@ export default function AIConsultingPage() {
         *::after {
           box-sizing: border-box;
         }
-        
 
         /* Scroll reveal */
         .sr {
@@ -327,7 +326,6 @@ export default function AIConsultingPage() {
       `}</style>
 
       <div className="bg-white text-[#1a1a2e] leading-relaxed overflow-x-hidden">
-
         {/* ── Hero ─────────────────────────────────────────────── */}
         <section
           id="about"

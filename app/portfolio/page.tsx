@@ -133,8 +133,6 @@ export default function Home() {
           --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        
-
         ::-webkit-scrollbar {
           width: 3px;
         }
@@ -264,13 +262,6 @@ export default function Home() {
           transition-delay: 0.45s;
         }
 
-        
-        
-        
-       
-
-
-        
         /* ---- Hero ---- */
         .hero {
           display: grid;
@@ -780,11 +771,9 @@ export default function Home() {
             border-bottom: 1px solid rgba(255, 255, 255, 0.15);
           }
 
-          
           .nav-hire-desktop {
             display: none;
           }
-          
         }
 
         @media (max-width: 560px) {

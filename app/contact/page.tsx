@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef } from "react";
 
-
 export default function ContactPage() {
   const [formStatus, setFormStatus] = useState<"idle" | "sending" | "sent">(
     "idle",
@@ -185,7 +184,7 @@ export default function ContactPage() {
           color: var(--navy);
           overflow-x: hidden;
         }
-        
+
         .font-manrope {
           font-family: "Manrope", sans-serif;
         }
