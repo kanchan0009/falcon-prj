@@ -133,16 +133,7 @@ export default function Home() {
           --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        html {
-          scroll-behavior: smooth;
-        }
-        body {
-          font-family: "Manrope", sans-serif;
-          background: var(--cream);
-          color: var(--navy);
-          overflow-x: hidden;
-          -webkit-font-smoothing: antialiased;
-        }
+        
 
         ::-webkit-scrollbar {
           width: 3px;
