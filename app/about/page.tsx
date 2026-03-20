@@ -1,342 +1,1238 @@
+// app/page.js (or pages/index.js)
 "use client";
-import React, { useEffect, useState } from 'react';
-import Head from 'next/head';
 
-export default function CredoLabPage() {
-  const [scrolled, setScrolled] = useState(false);
-  const [awardsIdx, setAwardsIdx] = useState(0);
-  const [teamIdx, setTeamIdx] = useState(0);
-  const [submitted, setSubmitted] = useState(false);
+import { useEffect, useState } from "react";
+import Head from "next/head";
+import Link from "next/link";
+
+export default function FalconTechAbout() {
+  const [openFaq, setOpenFaq] = useState(0);
+  const [counts, setCounts] = useState({
+    projects: 0,
+    team: 0,
+    customers: 0,
+    years: 0,
+  });
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 8);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
     // Scroll reveal
-    const revealEls = document.querySelectorAll('.sr, .sr-l, .sr-r');
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('in');
-          io.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-    revealEls.forEach(el => io.observe(el));
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("on");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" },
+    );
+
+    document
+      .querySelectorAll(".sr, .sr-l, .sr-r")
+      .forEach((el) => io.observe(el));
+
+    // Skill bars
+    const barIo = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.querySelectorAll(".skill-bar-fill").forEach((bar) => {
+              bar.style.width = bar.dataset.w;
+            });
+            barIo.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.3 },
+    );
+
+    const skillSection = document.querySelector(".skill-bars");
+    if (skillSection) barIo.observe(skillSection);
+
+    // Stat counters
+    const statIo = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            const targets = {
+              projects: 3,
+              team: 200,
+              customers: 350,
+              years: 16,
+            };
+            Object.keys(targets).forEach((key) => {
+              animateCount(key, targets[key]);
+            });
+            statIo.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.4 },
+    );
+
+    const statsRow = document.querySelector(".stats-row");
+    if (statsRow) statIo.observe(statsRow);
+
+    // Parallax
+    const handleScroll = () => {
+      const s = window.scrollY;
+      const dots = document.querySelector(".hero-dots");
+      if (dots && s < window.innerHeight) {
+        dots.style.transform = `translateY(${s * 0.08}px)`;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
       io.disconnect();
+      barIo.disconnect();
+      statIo.disconnect();
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
-  const slideAwards = (dir: number) => {
-    const track = document.getElementById('awards-track');
-    if (!track) return;
-    const cards = track.children.length;
-    const visible = Math.floor(track.parentElement!.offsetWidth / 218);
-    const max = Math.max(0, cards - visible);
-    const newIdx = Math.max(0, Math.min(max, awardsIdx + dir));
-    setAwardsIdx(newIdx);
-    (track as HTMLElement).style.transform = `translateX(-${newIdx * 218}px)`;
+  const animateCount = (key, target) => {
+    let current = 0;
+    const step = Math.max(1, target / 50);
+    const t = setInterval(() => {
+      current = Math.min(current + step, target);
+      setCounts((prev) => ({ ...prev, [key]: Math.floor(current) }));
+      if (current >= target) {
+        setCounts((prev) => ({ ...prev, [key]: target }));
+        clearInterval(t);
+      }
+    }, 28);
   };
 
-  const slideTeam = (dir: number) => {
-    const track = document.getElementById('team-track');
-    if (!track) return;
-    const cards = track.children.length;
-    const visible = Math.floor(track.parentElement!.offsetWidth / 224);
-    const max = Math.max(0, cards - visible);
-    const newIdx = Math.max(0, Math.min(max, teamIdx + dir));
-    setTeamIdx(newIdx);
-    (track as HTMLElement).style.transform = `translateX(-${newIdx * 224}px)`;
+  const toggleFaq = (index) => {
+    setOpenFaq(openFaq === index ? null : index);
   };
 
-  const handleSubmit = () => {
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
-  };
+  const services = [
+    {
+      num: "01",
+      icon: "📝",
+      title: "Content Marketing",
+      body: "Strategic content creation that drives organic growth, builds authority, and connects your brand with the right audience at every stage of their journey.",
+      featured: false,
+      delay: "d1",
+    },
+    {
+      num: "02",
+      icon: "📱",
+      title: "Social Media Marketing",
+      body: "Full-service social media management, community building, and campaign execution that amplifies your reach and drives real engagement.",
+      featured: true,
+      delay: "d2",
+    },
+    {
+      num: "03",
+      icon: "🔍",
+      title: "Search Engine Optimization",
+      body: "Data-driven SEO strategies that deliver top rankings, increase organic traffic, and generate sustainable long-term growth for your business.",
+      featured: false,
+      delay: "d3",
+    },
+    {
+      num: "04",
+      icon: "💻",
+      title: "Web Development",
+      body: "Custom websites and web applications built with modern tech stacks — fast, secure, scalable, and designed to convert visitors into customers.",
+      featured: false,
+      delay: "d2",
+    },
+    {
+      num: "05",
+      icon: "🎨",
+      title: "UI/UX Design",
+      body: "Research-backed design systems and interfaces that balance aesthetic beauty with functional clarity — making complex products feel effortless.",
+      featured: false,
+      delay: "d3",
+    },
+    {
+      num: "06",
+      icon: "🏆",
+      title: "Brand Strategy",
+      body: "Comprehensive brand development from identity to positioning — crafting a distinctive voice and visual language that sets you apart in your market.",
+      featured: false,
+      delay: "d4",
+    },
+  ];
+
+  const team = [
+    {
+      name: "Kartavya Basnet",
+      role: "Lead Developer",
+      bio: "Full-stack developer with a passion for clean architecture. Kartavya has led over 80 projects, championing best practices and innovative solutions.",
+      featured: false,
+      delay: "d1",
+      img: "ph-pale",
+    },
+    {
+      name: "Er. Sajeet Pokharel",
+      role: "CEO & Founder",
+      bio: "Visionary entrepreneur who founded FalconTech with the mission to democratize technology for businesses of all sizes across Nepal.",
+      featured: true,
+      delay: "d2",
+      img: "ph-navy",
+    },
+    {
+      name: "Ashok Kumar Mehta",
+      role: "Operations Director",
+      bio: "Strategic operations leader ensuring every project runs flawlessly — from discovery to deployment, zero compromise on quality.",
+      featured: false,
+      delay: "d3",
+      img: "ph-light",
+    },
+    {
+      name: "Saurab Singh Basnet",
+      role: "UI/UX Designer",
+      bio: "Award-winning designer who transforms complex user journeys into elegant, intuitive interfaces that users love and clients rave about.",
+      featured: false,
+      delay: "d1",
+      img: "ph-mid",
+    },
+    {
+      name: "Raaz Shrestha",
+      role: "Digital Strategist",
+      bio: "Data-driven strategist who turns analytics into actionable roadmaps with a track record of growing brand visibility and ROI.",
+      featured: false,
+      delay: "d2",
+      img: "ph-navy2",
+    },
+    {
+      name: "Krisha Karki",
+      role: "Content Lead",
+      bio: "Creative storyteller translating brand voices into compelling content — leading strategy, copywriting, and editorial across all touchpoints.",
+      featured: false,
+      delay: "d3",
+      img: "ph-pale",
+    },
+    {
+      name: "Prithvi Raj Pant",
+      role: "Backend Engineer",
+      bio: "Systems engineer specializing in scalable APIs and cloud infrastructure. Every product Prithvi builds is fast, secure, and built to grow.",
+      featured: false,
+      delay: "d1",
+      img: "ph-blue",
+    },
+    {
+      name: "Sijal Karki",
+      role: "Brand Designer",
+      bio: "Visual identity specialist crafting brand systems with soul — spanning logos, typography systems, brand guidelines, and motion graphics.",
+      featured: false,
+      delay: "d2",
+      img: "ph-light",
+    },
+    {
+      name: "Samit Panthee",
+      role: "CTO",
+      bio: "Technology visionary driving FalconTech's engineering culture with deep expertise in distributed systems, AI integration, and product engineering at scale.",
+      featured: true,
+      delay: "d3",
+      img: "ph-navy",
+    },
+    {
+      name: "Simran Shrestha",
+      role: "Project Manager",
+      bio: "Certified project manager who keeps teams aligned and timelines intact. Simran brings calm, structure, and precision to every engagement.",
+      featured: false,
+      delay: "d1",
+      img: "ph-mid",
+    },
+    {
+      name: "Saurav Raj Pant",
+      role: "Mobile Developer",
+      bio: "Flutter and React Native expert crafting seamless mobile experiences. Saurav has shipped apps across Nepal and internationally with hundreds of thousands of active users.",
+      featured: false,
+      delay: "d2",
+      img: "ph-blue",
+      wide: true,
+    },
+    {
+      name: "Jenuine Karki",
+      role: "Social Media Manager",
+      bio: "Social media strategist building communities and amplifying brand stories. Campaigns that have generated millions of organic impressions.",
+      featured: false,
+      delay: "d3",
+      img: "ph-pale",
+    },
+    {
+      name: "Sansar Maharjan",
+      role: "DevOps Engineer",
+      bio: "Infrastructure specialist ensuring zero-downtime releases. Sansar architects CI/CD pipelines, monitoring stacks, and cloud environments.",
+      featured: false,
+      delay: "d1",
+      img: "ph-light",
+    },
+    {
+      name: "Rohan Sunuwar",
+      role: "Graphic Designer",
+      bio: "Multi-disciplinary visual designer with expertise in print and digital. Rohan brings brands to life through powerful visual storytelling and meticulous craft.",
+      featured: true,
+      delay: "d2",
+      img: "ph-navy2",
+    },
+    {
+      name: "Anuj Thapa",
+      role: "SEO Specialist",
+      bio: "Search engine strategist with a data-first approach. Anuj's organic campaigns consistently deliver top-3 rankings and sustainable traffic growth.",
+      featured: false,
+      delay: "d3",
+      img: "ph-mid",
+    },
+    {
+      name: "Sikum Lungphuwa",
+      role: "Video Producer",
+      bio: "Award-winning video producer creating compelling brand films, product demos, and visual stories that capture attention and drive engagement.",
+      featured: false,
+      delay: "d1",
+      img: "ph-pale",
+    },
+  ];
+
+  const faqs = [
+    {
+      q: "Why choose us?",
+      a: "FalconTech Nepal provides cutting-edge solutions tailored to your needs. With 15+ years of experience and a dedicated team of 50+ experts, we deliver results that transform businesses. Our client-first approach means personalized attention, not a template.",
+    },
+    {
+      q: "What services does Falcon Tech Nepal offer?",
+      a: "We offer a full spectrum of digital services including web development, UI/UX design, mobile app development, software consulting, SEO strategy, digital marketing, content creation, multimedia production, and ongoing technical support.",
+    },
+    {
+      q: "How do I get started with a solution?",
+      a: "Getting started is simple — reach out via our contact page, schedule a free discovery call, and we'll put together a customized proposal. From there, our team will onboard you smoothly within 48 hours.",
+    },
+    {
+      q: "Do you offer custom software development?",
+      a: "Absolutely. Our engineering team specializes in bespoke software solutions — from enterprise systems to lightweight SaaS tools — built with your exact requirements, scalability, and budget in mind.",
+    },
+    {
+      q: "Can you manage my existing website or app?",
+      a: "Yes! We offer comprehensive management and maintenance packages for existing websites and applications, including updates, performance optimization, security audits, and feature expansion.",
+    },
+    {
+      q: "How can I run my privacy needs?",
+      a: "We take data privacy very seriously. All client data is handled under strict confidentiality agreements and we comply with relevant data protection regulations. You retain full ownership of your data at all times.",
+    },
+  ];
+
+  const marqueeItems = [
+    "Digital Marketing",
+    "Content Marketing",
+    "Social Media Marketing",
+    "Search Engine Optimization",
+    "Web Development",
+    "UI/UX Design",
+    "Brand Strategy",
+  ];
 
   return (
     <>
       <Head>
-        <title>CredoLab – Building the Future of Behavioural Analytics</title>
+        <title>FalconTech — About & Team</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap"
+          rel="stylesheet"
+        />
       </Head>
 
       <style jsx global>{`
-        html { scroll-behavior: smooth; }
-        
-        
-        .sr { opacity: 0; transform: translateY(30px); transition: opacity .7s ease, transform .7s ease; }
-        .sr.in { opacity: 1; transform: translateY(0); }
-        .sr-l { opacity: 0; transform: translateX(-30px); transition: opacity .7s ease, transform .7s ease; }
-        .sr-l.in { opacity: 1; transform: translateX(0); }
-        .sr-r { opacity: 0; transform: translateX(30px); transition: opacity .7s ease, transform .7s ease; }
-        .sr-r.in { opacity: 1; transform: translateX(0); }
-        .d1 { transition-delay: .1s !important; }
-        .d2 { transition-delay: .18s !important; }
-        .d3 { transition-delay: .26s !important; }
-        .d4 { transition-delay: .34s !important; }
-        
-        @keyframes marquee { 0%{transform:translateX(0)}100%{transform:translateX(-50%)} }
-        .marquee-track { animation: marquee 20s linear infinite; }
-        .marquee-track:hover { animation-play-state: paused; }
-        
-        @keyframes floatY { 0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)} }
-        .float-badge { animation: floatY 3s ease-in-out infinite; }
-        
-        @keyframes mapPulse {
-          0%,100%{box-shadow:0 0 0 3px rgba(255,95,163,.35)}
-          50%{box-shadow:0 0 0 8px rgba(255,95,163,.1)}
+        :root {
+          --orange: #f97316;
+          --orange-dark: #ea6500;
+          --orange-light: #fff4ec;
+          --orange-glow: rgba(249, 115, 22, 0.15);
+          --navy: #0d1b3e;
+          --navy-mid: #162852;
+          --navy-light: #1e3570;
+          --navy-pale: #eef2fb;
+          --white: #ffffff;
+          --off-white: #f8f9fc;
+          --text-muted: #64748b;
+          --text-light: #94a3b8;
+          --border: #e2e8f0;
+          --ease: cubic-bezier(0.16, 1, 0.3, 1);
+          --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .map-pin-pulse { animation: mapPulse 2.2s ease-in-out infinite; }
+
+        .font-manrope {
+          font-family: "Manrope", sans-serif;
+        }
+        .font-playfair {
+          font-family: "Playfair Display", serif;
+        }
+
+        @keyframes heroIn {
+          from {
+            opacity: 0;
+            transform: translateY(50px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        @keyframes lineW {
+          from {
+            transform: scaleX(0);
+          }
+          to {
+            transform: scaleX(1);
+          }
+        }
+        @keyframes marquee {
+          from {
+            transform: translateX(0);
+          }
+          to {
+            transform: translateX(-50%);
+          }
+        }
+        @keyframes floatY {
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+        @keyframes rotateSlow {
+          from {
+            transform: rotate(0);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        @keyframes pulseDot {
+          0%,
+          100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.5);
+          }
+        }
+        @keyframes badgePop {
+          from {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        .sr {
+          opacity: 0;
+          transform: translateY(40px);
+          transition:
+            opacity 0.8s var(--ease),
+            transform 0.8s var(--ease);
+        }
+        .sr.on {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .sr-l {
+          opacity: 0;
+          transform: translateX(-40px);
+          transition:
+            opacity 0.8s var(--ease),
+            transform 0.8s var(--ease);
+        }
+        .sr-l.on {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        .sr-r {
+          opacity: 0;
+          transform: translateX(40px);
+          transition:
+            opacity 0.8s var(--ease),
+            transform 0.8s var(--ease);
+        }
+        .sr-r.on {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        .d1 {
+          transition-delay: 0.08s !important;
+        }
+        .d2 {
+          transition-delay: 0.16s !important;
+        }
+        .d3 {
+          transition-delay: 0.24s !important;
+        }
+        .d4 {
+          transition-delay: 0.32s !important;
+        }
+        .d5 {
+          transition-delay: 0.4s !important;
+        }
+        .d6 {
+          transition-delay: 0.48s !important;
+        }
+
+        .animate-heroIn {
+          animation: heroIn 0.9s var(--ease) both;
+        }
+        .animate-fadeIn {
+          animation: fadeIn 1.5s ease 0.3s both;
+        }
+        .animate-lineW {
+          animation: lineW 0.8s 0.9s var(--ease) both;
+          transform-origin: left;
+        }
+        .animate-marquee {
+          animation: marquee 22s linear infinite;
+        }
+        .animate-floatY {
+          animation: floatY 5s ease-in-out infinite;
+        }
+        .animate-rotateSlow {
+          animation: rotateSlow 8s linear infinite;
+        }
+        .animate-pulseDot {
+          animation: pulseDot 2s infinite;
+        }
+        .animate-badgePop {
+          animation: badgePop 0.6s 0.2s var(--spring) both;
+        }
+
+        /* Image placeholders */
+        .ph-navy {
+          background: linear-gradient(145deg, #0d1b3e, #1e3570);
+          color: rgba(255, 255, 255, 0.18);
+        }
+        .ph-navy2 {
+          background: linear-gradient(145deg, #162852, #243d80);
+          color: rgba(255, 255, 255, 0.15);
+        }
+        .ph-blue {
+          background: linear-gradient(145deg, #1e3570, #2a4a92);
+          color: rgba(255, 255, 255, 0.18);
+        }
+        .ph-pale {
+          background: linear-gradient(145deg, #c8d5f0, #afc0e0);
+          color: rgba(13, 27, 62, 0.2);
+        }
+        .ph-light {
+          background: linear-gradient(145deg, #dce6f8, #c8d8f0);
+          color: rgba(13, 27, 62, 0.18);
+        }
+        .ph-mid {
+          background: linear-gradient(145deg, #b8cce8, #a0bcd8);
+          color: rgba(13, 27, 62, 0.2);
+        }
+
+        /* Button hover effects */
+        .btn-orange svg {
+          transition: transform 0.3s ease;
+        }
+        .btn-orange:hover svg {
+          transform: translateX(4px);
+        }
+
+        /* Service card effects */
+        .service-card::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            135deg,
+            var(--orange-glow),
+            transparent 60%
+          );
+          opacity: 0;
+          transition: opacity 0.4s;
+          pointer-events: none;
+        }
+        .service-card:hover::before {
+          opacity: 1;
+        }
+        .service-card:hover {
+          background: rgba(255, 255, 255, 0.07);
+          border-color: rgba(249, 115, 22, 0.3);
+          transform: translateY(-6px);
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        }
+        .service-card:hover .sc-icon-wrap {
+          transform: scale(1.1) rotate(-5deg);
+        }
+        .service-card:hover .sc-hover-line {
+          transform: scaleX(1);
+        }
+
+        /* Team card effects */
+        .team-card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 24px 56px rgba(13, 27, 62, 0.12);
+          border-color: rgba(249, 115, 22, 0.2);
+        }
+        .team-card:hover .tc-img-overlay {
+          opacity: 1;
+        }
+        .team-card:hover .tc-bar {
+          transform: scaleX(1);
+        }
+        .tc-social:hover {
+          background: var(--orange);
+          border-color: var(--orange);
+          color: #fff;
+          transform: scale(1.15);
+        }
+
+        /* FAQ effects */
+        .faq-item.open .faq-icon {
+          background: var(--orange);
+          border-color: var(--orange);
+          color: #fff;
+          transform: rotate(45deg);
+        }
+
+        /* Responsive */
+        @media (max-width: 1100px) {
+          .hero-grid {
+            grid-template-columns: 1fr 1fr;
+            min-height: auto;
+          }
+          .about-grid {
+            grid-template-columns: 1fr;
+            gap: 50px;
+            padding: 80px 40px;
+          }
+          .about-imgs {
+            display: none;
+          }
+          .faq-grid {
+            grid-template-columns: 1fr;
+            padding: 80px 40px;
+          }
+          .faq-visual {
+            display: none;
+          }
+          .team-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+          .team-wide {
+            grid-column: span 1;
+          }
+          .services-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+          .services-header {
+            grid-template-columns: 1fr;
+          }
+          .cta-grid {
+            grid-template-columns: 1fr;
+          }
+          .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        @media (max-width: 768px) {
+          .hero-grid {
+            grid-template-columns: 1fr;
+            min-height: auto;
+          }
+          .hero-left {
+            padding: 60px 24px 40px;
+          }
+          .hero-right {
+            padding: 0 24px 40px;
+            grid-template-rows: 280px 180px;
+          }
+          .team-grid,
+          .services-grid {
+            grid-template-columns: 1fr;
+          }
+          .cta-navy,
+          .cta-orange {
+            padding: 50px 28px;
+          }
+          .hero-actions {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          .stats-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+          .about-section,
+          .team-section,
+          .services-section,
+          .faq-section {
+            padding: 60px 24px;
+          }
+        }
       `}</style>
 
-      <div className="bg-white text-[#1c1c2e]  leading-relaxed overflow-x-hidden">
+      <div className="font-manrope bg-white text-[#0d1b3e] overflow-x-hidden">
+        {/* ════════════════ HERO ════════════════ */}
+        {/* ════════════════ HERO ════════════════ */}
+        <section className="hero-grid flex flex-col lg:flex-row gap-0 items-stretch min-h-[92vh] relative overflow-hidden bg-[#f8f9fc]">
+          <div className="hero-dots absolute inset-0 pointer-events-none z-0 animate-fadeIn bg-[radial-gradient(circle,rgba(13,27,62,0.07)_1px,transparent_1px)] bg-[length:32px_32px]" />
+          <div className="absolute -top-[150px] -left-[60px] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgba(249,115,22,0.06),transparent_70%)] pointer-events-none z-0" />
 
-        {/* Hero */}
-        <section className="pt-24 pb-14">
-          <div className="max-w-[1120px] mx-auto px-8">
-            <div className="grid grid-cols-2 gap-12 items-center">
-              <div className="sr-l">
-                <h1 className="text-[44px] font-extrabold text-[#111827] leading-tight mb-4">Curious, Innovative, Driven.<br/>Sound like you?</h1>
-                <p className="text-[14px] text-[#6b7280] leading-relaxed max-w-[430px] mb-7">Falcon was founded with the mission to bring the most innovative, scalable and ethical predictive analytics solutions for consumer profiling and credit decision processes.</p>
-                <button className="inline-flex items-center gap-1.5 px-5 py-2 bg-[#6B21C8] text-white rounded-md text-[13px] font-bold hover:bg-[#5a18a8] hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,33,200,.32)] transition-all tracking-wide">Get a Demo</button>
+          {/* LEFT SIDE (TEXT) */}
+          <div className="hero-left w-full lg:w-[55%] relative z-[2] px-20 py-[90px] pb-20 flex flex-col justify-center lg:px-10 lg:py-16 md:px-6 md:py-10">
+            <div className="inline-flex items-center gap-1.5 bg-[#fff4ec] border border-[rgba(249,115,22,0.25)] text-[#ea6500] text-[11px] font-bold tracking-[0.12em] uppercase px-3.5 py-1 rounded-full mb-7 animate-badgePop">
+              <span className=" rounded-full bg-[#f97316] animate-pulseDot" />
+              Elevate Your Brand With Us
+            </div>
+
+            <h1 className="font-playfair font-extrabold text-[clamp(38px,4.5vw,64px)] leading-[1.02] tracking-[-0.03em] text-[#0d1b3e] mb-6">
+              <span className="block overflow-hidden">
+                <span
+                  className="block animate-heroIn"
+                  style={{ animationDelay: "0.35s" }}
+                >
+                  Empowering Your
+                </span>
+              </span>
+              <span className="block overflow-hidden">
+                <span
+                  className="block animate-heroIn"
+                  style={{ animationDelay: "0.5s" }}
+                >
+                  Success with
+                </span>
+              </span>
+              <span className="block overflow-hidden">
+                <span
+                  className="block animate-heroIn italic text-[#f97316]"
+                  style={{ animationDelay: "0.65s" }}
+                >
+                  Digital Expertise
+                </span>
+              </span>
+            </h1>
+
+            <p
+              className="text-[15px] font-normal leading-[1.8] text-[#64748b] max-w-[420px] mb-10 animate-heroIn opacity-0"
+              style={{ animationDelay: "0.85s" }}
+            >
+              FalconTech helps you discover how incredibly easy it is to
+              streamline your workflow, sharpen your skills, and achieve your
+              milestones. We empower you to feel inspired and grow continuously.
+            </p>
+
+            <div
+              className="flex items-center gap-4 flex-wrap animate-heroIn opacity-0 md:flex-col md:items-start"
+              style={{ animationDelay: "1s" }}
+            >
+              <Link
+                href="#about"
+                className="btn-orange inline-flex items-center gap-2 bg-[#f97316] text-white px-7 py-3 rounded-full text-[13px] font-bold tracking-[0.04em] no-underline transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-[0_6px_24px_rgba(249,115,22,0.35)] hover:bg-[#ea6500] hover:-translate-y-0.5 hover:shadow-[0_10px_32px_rgba(249,115,22,0.45)]"
+              >
+                Explore More
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </Link>
+              <Link
+                href="#services"
+                className="inline-flex items-center gap-2 border-[1.5px] border-[#e2e8f0] text-[#0d1b3e] px-6 py-3 rounded-full text-[13px] font-semibold no-underline transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-[#f97316] hover:text-[#f97316] hover:-translate-y-0.5"
+              >
+                View All Services
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
+          </div>
+
+          {/* RIGHT SIDE (IMAGES) */}
+          <div
+            className="hero-right w-full lg:w-[45%] relative z-[2] grid grid-rows-[62%_38%] grid-cols-2 gap-2.5 p-6 pb-6 pl-0 animate-heroIn opacity-0 lg:p-5 lg:pb-10 md:grid-rows-[280px_180px] md:p-6 md:pb-10 md:pl-6"
+            style={{ animationDelay: "0.4s" }}
+          >
+            <div className="col-start-1 col-end-2 row-start-1 row-end-3 rounded-[20px] overflow-hidden shadow-[0_24px_60px_rgba(13,27,62,0.18)] relative">
+              <div className="ph-navy2 w-full h-full min-h-full flex items-center justify-center text-[10px] font-semibold tracking-[0.15em] uppercase">
+                Team Photo
               </div>
-      
-            </div>
-          </div>
-        </section>
-
-        {/* Trusted By */}
-        <section className="bg-[#f9fafb] border-y border-[#e5e7eb] py-3.5 overflow-hidden">
-          <div className="text-center text-[10px] font-bold text-[#9ca3af] tracking-widest uppercase mb-3.5">Trusted by the World&apos;s Biggest Brands</div>
-          <div className="overflow-hidden">
-            <div className="marquee-track flex gap-0 hover:[animation-play-state:paused]">
-              {[1, 2].map((set) => (
-                <div key={set} className="flex items-center gap-12 px-6 flex-shrink-0" aria-hidden={set === 2}>
-                  {['MAMBU', 'tonik', 'agibank', 'STRANDS', 'Today', 'FairMoney', 'HomCredit', 'Kredivo'].map((logo, i) => (
-                    <span key={i} className={`text-[13px] font-extrabold text-[#9ca3af] tracking-wider uppercase opacity-70 hover:opacity-100 transition-opacity ${logo === 'tonik' ? 'italic text-[15px] tracking-[0.01em]' : ''}`}>
-                      {logo}
-                    </span>
-                  ))}
+              <div className="absolute bottom-5 -right-3.5 bg-[#f97316] text-white w-24 h-24 rounded-full flex flex-col items-center justify-center text-[10px] font-bold tracking-[0.08em] text-center shadow-[0_10px_32px_rgba(249,115,22,0.5)] animate-floatY z-[6] leading-tight">
+                <div className="font-playfair text-2xl font-extrabold leading-none">
+                  15+
                 </div>
-              ))}
+                <div className="text-[9px] tracking-[0.06em]">Yrs Exp</div>
+              </div>
+            </div>
+
+            <div className="col-start-2 col-end-3 row-start-1 row-end-2 rounded-[20px] overflow-hidden shadow-[0_12px_30px_rgba(13,27,62,0.12)] relative">
+              <div className="ph-light w-full h-full min-h-full flex items-center justify-center text-[10px] font-semibold tracking-[0.15em] uppercase">
+                Office Space
+              </div>
+            </div>
+
+            <div className="col-start-2 col-end-3 row-start-2 row-end-3 rounded-[20px] overflow-hidden shadow-[0_12px_30px_rgba(13,27,62,0.12)] relative">
+              <div className="ph-pale w-full h-full min-h-full flex items-center justify-center text-[10px] font-semibold tracking-[0.15em] uppercase">
+                Collaboration
+              </div>
+              <div className="hero-star absolute bottom-3.5 right-3.5 text-[22px] text-[#f97316] animate-rotateSlow pointer-events-none z-[5]">
+                ✦
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Stats */}
-        <section className="py-[52px] pb-12 max-w-full">
-          <div className="  min-w-[300px] mx-[200px] px-8">
-            <div className="grid grid-cols-3 gap-30 justify-around">
+        {/* ════════════════ MARQUEE ════════════════ */}
+        <div
+          className="bg-[#0d1b3e] py-4 overflow-hidden border-t border-white/5"
+          aria-hidden="true"
+        >
+          <div className="flex whitespace-nowrap animate-marquee">
+            {[...marqueeItems, ...marqueeItems].map((item, i) => (
+              <div
+                key={i}
+                className="inline-flex items-center gap-4 px-8 flex-shrink-0 text-[13px] font-semibold tracking-[0.1em] uppercase text-white/60"
+              >
+                <span className="text-[#f97316] text-[10px]">✦</span>
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ════════════════ ABOUT ════════════════ */}
+        <section
+          className="about-grid about-section grid grid-cols-2 gap-20 items-center py-[110px] px-20 bg-white lg:py-20 lg:px-10 md:py-16 md:px-6"
+          id="about"
+        >
+          <div className="sr-l about-imgs relative h-[500px] lg:hidden">
+            <div className="absolute top-0 left-0 w-[60%] h-[68%] rounded-[20px] overflow-hidden shadow-[0_24px_60px_rgba(13,27,62,0.14)]">
+              <div className="ph-navy2 w-full h-full flex items-center justify-center text-[10px] font-semibold tracking-[0.15em] uppercase">
+                Team at Work
+              </div>
+            </div>
+            <div className="absolute bottom-0 right-0 w-[58%] h-[55%] rounded-[20px] overflow-hidden shadow-[0_16px_40px_rgba(13,27,62,0.1)] border-[5px] border-white">
+              <div className="ph-pale w-full h-full flex items-center justify-center text-[10px] font-semibold tracking-[0.15em] uppercase">
+                Collaboration
+              </div>
+            </div>
+            <div className="absolute top-[52%] -left-5 bg-[#f97316] text-white px-5 py-4 rounded-xl text-center z-[4] shadow-[0_10px_32px_rgba(249,115,22,0.4)] animate-floatY">
+              <div className="font-playfair text-[30px] font-extrabold leading-none">
+                10+
+              </div>
+              <div className="text-[10px] font-semibold tracking-[0.08em] uppercase opacity-88 mt-1">
+                Years of
+                <br />
+                Experience
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div className="sr inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.2em] uppercase text-[#f97316] mb-4">
+              <span className="w-5 h-0.5 bg-[#f97316] rounded-sm" />
+              About Us
+            </div>
+            <h2 className="sr d1 font-playfair font-bold text-[clamp(34px,3.5vw,52px)] leading-[1.08] tracking-[-0.02em] text-[#0d1b3e] mb-4">
+              Empowering Your Success
+              <br />
+              with <em className="italic text-[#f97316]">Digital Expertise</em>
+            </h2>
+            <p className="sr d2 text-[15px] font-normal leading-[1.85] text-[#64748b] mb-8">
+              FalconTech Nepal provides cutting-edge digital solutions tailored
+              to your needs. With 15+ years of experience and a dedicated team
+              of 50+ experts, we deliver results that transform businesses. Our
+              client-first approach means personalized attention — not a
+              template.
+            </p>
+
+            <div className="sr d3 skill-bars flex flex-col gap-4.5 mb-9">
               {[
-                { color: 'bg-[#06c8d4]', value: '500+M', label: 'Digital Footprints', delay: 'd1' },
-                { color: 'bg-[#e91e8c]', value: '50+', label: 'Countries', delay: 'd2' },
-                { color: 'bg-[#00c875]', value: '0', label: 'Financial Defaults', delay: 'd3' }
-              ].map((stat, i) => (
-                <div key={i} className={`${stat.color} rounded-[14px] py-7 px-6 text-center text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_40px_rgba(0,0,0,.13)] sr ${stat.delay}`}>
-                  <div className="text-[38px] font-extrabold leading-none">{stat.value}</div>
-                  <div className="text-[13px] font-semibold mt-1.5 opacity-90">{stat.label}</div>
+                { name: "Marketing & Business Growth", pct: "65%" },
+                { name: "Creativity & Innovation", pct: "90%" },
+                { name: "Business & Financial Management", pct: "98%" },
+              ].map((skill, i) => (
+                <div key={i}>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-[13px] font-semibold text-[#0d1b3e]">
+                      {skill.name}
+                    </span>
+                    <span className="text-xs font-bold text-[#f97316]">
+                      {skill.pct}
+                    </span>
+                  </div>
+                  <div className="w-full h-[7px] rounded-full bg-[#eef2fb] overflow-hidden">
+                    <div
+                      className="skill-bar-fill h-full rounded-full bg-gradient-to-r from-[#f97316] to-[#ea6500] w-0 transition-[width] duration-[1.2s] ease-[cubic-bezier(0.16,1,0.3,1)]"
+                      data-w={skill.pct}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
+
+            <Link
+              href="#team"
+              className="sr d4 btn-orange inline-flex items-center gap-2 bg-[#f97316] text-white px-7 py-3 rounded-full text-[13px] font-bold tracking-[0.04em] no-underline transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-[0_6px_24px_rgba(249,115,22,0.35)] hover:bg-[#ea6500] hover:-translate-y-0.5 hover:shadow-[0_10px_32px_rgba(249,115,22,0.45)] w-fit"
+            >
+              About Us
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
           </div>
         </section>
 
-        {/* Story */}
-        <section className="py-14 pb-[52px] border-t border-[#e5e7eb]">
-          <div className="max-w-[1120px] mx-auto px-8">
-            <div className="grid grid-cols-[260px_1fr] gap-16">
-              <div className="sr-l">
-                <h2 className="text-[30px] font-extrabold text-[#111827]">Our story</h2>
-              </div>
-              <div className="sr-r d1">
-                <div className="text-[13.5px] text-[#4b5563] leading-relaxed">
-                  <p className="mb-3.5"><a href="#" className="text-[#6B21C8] font-bold">Falcon</a> was founded with the same passion that drives its team forward: a continuous effort to improve financial inclusion by empowering underbanked populations.</p>
-                  <p className="mb-3.5">Falcon&apos;s data-driven solutions provide actionable insights to the fintech and banking industry to improve customer communication, marketing decisions, lending decisions, and fraud prevention.</p>
-                  <p className="mb-3.5">Our solutions leverage app-level behavioural data and device metadata to deliver financial services to the unbanked and underbanked, while strengthening defences against fraud. By lifting over 5,000 people into formal banking every week, we&apos;re transforming lives and building a more inclusive financial ecosystem for everyone.</p>
-                  <div className="mt-3.5 flex flex-col gap-2.5">
-                    {[
-                      'Reduce credit risk information for 50 clients, offering higher accuracy in predictions to identify potential customers resulting in increased approval rates and reduced rejection rates.',
-                      'Enhance fraud detection through fraud scores and a solution efficiently identifying fraudulent applications and aiding banks to mitigate such cases and financial losses.',
-                      'Improve marketing efficiency with more targeted tools and a better ROI generation and campaigns, and more responsive, uninterrupted marketing spending.'
-                    ].map((text, i) => (
-                      <div key={i} className="flex gap-2.5">
-                        <div className="w-[18px] h-[18px] rounded-full bg-[#6B21C8] flex-shrink-0 mt-[3px] flex items-center justify-center">
-                          <svg viewBox="0 0 10 10" className="w-[9px] h-[9px] stroke-white stroke-[2.5] fill-none stroke-linecap-round stroke-linejoin-round">
-                            <path d="M2 5l2.5 2.5 3.5-4"/>
-                          </svg>
-                        </div>
-                        <span>{text}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="mt-3.5">In addition to UAE, CredoLab has achieved significant success in international markets in Southeast Asia and Latin America.</p>
+        {/* Stats strip */}
+        <div className="bg-[#f8f9fc] border-t border-[#e2e8f0] px-20 lg:px-10 md:px-6">
+          <div className="stats-grid grid grid-cols-4 gap-5 py-0 lg:grid-cols-2">
+            {[
+              {
+                num: counts.projects,
+                suffix: "k+",
+                label: "Successful Projects",
+                key: "projects",
+              },
+              {
+                num: counts.team,
+                suffix: "+",
+                label: "Expert Team",
+                key: "team",
+              },
+              {
+                num: counts.customers,
+                suffix: "+",
+                label: "Happy Customers",
+                key: "customers",
+              },
+              {
+                num: counts.years,
+                suffix: "+",
+                label: "Years of Experience",
+                key: "years",
+              },
+            ].map((stat, i) => (
+              <div key={i} className={`sr d${i + 1} py-8`}>
+                <div className="font-playfair text-[36px] font-extrabold text-[#0d1b3e] leading-none flex items-baseline gap-1">
+                  <span>{stat.num}</span>
+                  <span className="text-[#f97316] font-manrope font-extrabold text-2xl">
+                    {stat.suffix}
+                  </span>
+                </div>
+                <div className="text-xs text-[#64748b] font-medium mt-1 tracking-[0.02em] flex items-center">
+                  <span className="inline-flex w-2 h-2 rounded-full bg-[#f97316] mr-1.5 animate-pulseDot" />
+                  {stat.label}
                 </div>
               </div>
-            </div>
+            ))}
           </div>
-        </section>
+        </div>
 
-        {/* Awards */}
-        <section className="py-[52px]">
-          <div className="max-w-[1120px] mx-auto px-8">
-            <div className="sr">
-              <h2 className="text-[28px] font-extrabold text-center text-[#111827] mb-1.5">Awards</h2>
-              <p className="text-[13px] text-[#9ca3af] text-center mb-9">More than 15 awards and recognitions</p>
-            </div>
-            <div className="relative sr d1">
-              <button onClick={() => slideAwards(-1)} className="absolute top-1/2 -translate-y-1/2 -left-[18px] w-[34px] h-[34px] rounded-full bg-white border-[1.5px] border-[#e5e7eb] shadow-[0_2px_16px_rgba(0,0,0,.09)] flex items-center justify-center text-[16px] text-[#4b5563] hover:bg-[#6B21C8] hover:text-white hover:border-[#6B21C8] transition-all z-5">‹</button>
-              <div className="overflow-hidden px-1 py-3">
-                <div id="awards-track" className="flex gap-[18px] transition-transform duration-[420ms]" style={{ transform: `translateX(-${awardsIdx * 218}px)` }}>
-                  {[
-                    { logo: 'JFNEXT', tag: 'ACCELERATE+', desc: 'Accelerate the future Fintech Award 2021' },
-                    { logo: 'PLUG AND PLAY', tag: 'FINTECH PROGRAM', desc: 'FinTech in Asia, Plug and Play Fintech Program', small: true },
-                    { logo: 'Efma', tag: 'INNOVATION', desc: 'Best Innovative Digital Platform Award' },
-                    { logo: 'Finovate', tag: 'BEST OF SHOW', desc: 'Finovate Asia Best of Show Award' },
-                    { logo: 'MAS FSTI', tag: 'GLOBAL FINTECH', desc: 'MAS Global FinTech Innovation Challenge Winner', small: true }
-                  ].map((award, i) => (
-                    <div key={i} className="flex-shrink-0 w-[200px] border-[1.5px] border-[#e5e7eb] rounded-[14px] py-5 px-4 text-center bg-white shadow-[0_2px_10px_rgba(0,0,0,.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_2px_16px_rgba(0,0,0,.09)] hover:border-[#6B21C8]">
-                      <div className={`font-extrabold text-[#6B21C8] mb-1 ${award.small ? 'text-[13px]' : 'text-[16px]'}`}>{award.logo}</div>
-                      <div className="text-[10px] font-bold text-[#9ca3af] tracking-wide mb-2">{award.tag}</div>
-                      <div className="text-[11.5px] text-[#6b7280] leading-snug">{award.desc}</div>
-                    </div>
-                  ))}
-                </div>
+        {/* ════════════════ SERVICES ════════════════ */}
+        <section
+          className="services-section bg-[#0d1b3e] py-[110px] px-20 relative overflow-hidden lg:py-20 lg:px-10 md:py-16 md:px-6"
+          id="services"
+        >
+          <div className="absolute -top-[200px] -right-[200px] w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(249,115,22,0.08),transparent_70%)] pointer-events-none" />
+          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:28px_28px]" />
+
+          <div className="services-header grid grid-cols-[1fr_auto] items-end mb-16 relative z-[2] lg:grid-cols-1">
+            <div>
+              <div className="sr inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.2em] uppercase text-[#f97316] mb-3">
+                <span className="w-5 h-0.5 bg-[#f97316] rounded-sm" />
+                Our Services
               </div>
-              <button onClick={() => slideAwards(1)} className="absolute top-1/2 -translate-y-1/2 -right-[18px] w-[34px] h-[34px] rounded-full bg-white border-[1.5px] border-[#e5e7eb] shadow-[0_2px_16px_rgba(0,0,0,.09)] flex items-center justify-center text-[16px] text-[#4b5563] hover:bg-[#6B21C8] hover:text-white hover:border-[#6B21C8] transition-all z-5">›</button>
+              <h2 className="sr d1 font-playfair font-bold text-[clamp(34px,3.5vw,52px)] leading-[1.05] tracking-[-0.02em] text-white mb-3">
+                Boost Your Brand
+                <br />
+                with <em className="italic text-[#f97316]">Our Expertise</em>
+              </h2>
+              <p className="sr d2 text-sm leading-[1.75] text-white/50 max-w-[380px] mt-3">
+                Empowering businesses with tailored digital solutions — from
+                creative content to technical excellence.
+              </p>
             </div>
+            <Link
+              href="#"
+              className="sr btn-orange inline-flex items-center gap-2 bg-[#f97316] text-white px-7 py-3 rounded-full text-[13px] font-bold tracking-[0.04em] no-underline transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-[0_6px_24px_rgba(249,115,22,0.35)] hover:bg-[#ea6500] hover:-translate-y-0.5 hover:shadow-[0_10px_32px_rgba(249,115,22,0.45)] flex-shrink-0 self-center lg:mt-5"
+            >
+              View All Services
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
           </div>
-        </section>
 
-        {/* Mission/Vision/Values */}
-        <section>
-          <div className="bg-[#6B21C8] py-6 px-8">
-            <div className="max-w-[1120px] mx-auto flex items-center gap-8 hover:h-[200px] hover:transition-transform duration-[300ms] ">
-              <div className="min-w-[180px] text-[28px] font-extrabold text-white flex-shrink-0 ">Our mission</div>
-              <div className="text-[13.5px] text-white/88">CredoLab improves people&apos;s lives by powering every credit decision.</div>
-            </div>
-          </div>
-          <div className="bg-[#e91e8c] py-6 px-8">
-            <div className="max-w-[1120px] mx-auto flex items-center gap-8 hover:h-[200px] hover:transition-transform duration-[300ms]">
-              <div className="min-w-[180px] text-[28px] font-extrabold text-white flex-shrink-0">Our vision</div>
-              <div className="text-[13.5px] text-white/88">Easy access to fair credit for all.</div>
-            </div>
-          </div>
-          <div className="bg-[#f3f4f6] py-6 px-8">
-            <div className="max-w-[1120px] mx-auto flex items-center gap-8 hover:h-[200px] hover:transition-scale duration-[300ms]">
-              <div className="min-w-[180px] text-[28px] font-extrabold text-[#111827] flex-shrink-0">Our values</div>
-              <div className="text-[13.5px] text-[#4b5563]">Audaciously Selfless. CredoLab employees are proactive in identifying opportunities for themselves and others. They are driven, curious, and always looking to create more value.</div>
-            </div>
-          </div>
-        </section>
-
-        {/* Team */}
-        <section className="py-[60px]">
-          <div className="max-w-[1120px] mx-auto px-8">
-            <div className="sr">
-              <h2 className="text-[28px] font-extrabold text-center text-[#111827] mb-1.5">Our team</h2>
-              <p className="text-[13px] text-[#9ca3af] text-center mb-9">The people behind the magic at CredoLab</p>
-            </div>
-            <div className="relative mt-9">
-              <button onClick={() => slideTeam(-1)} className="absolute top-1/2 -translate-y-1/2 -left-[18px] w-[34px] h-[34px] rounded-full bg-white border-[1.5px] border-[#e5e7eb] shadow-[0_2px_16px_rgba(0,0,0,.09)] flex items-center justify-center text-[16px] text-[#4b5563] hover:bg-[#6B21C8] hover:text-white hover:border-[#6B21C8] transition-all z-5">‹</button>
-              <div className="overflow-hidden px-1 py-2">
-                <div id="team-track" className="flex gap-6 transition-transform duration-[420ms]" style={{ transform: `translateX(-${teamIdx * 224}px)` }}>
-                  {[
-                    { initials: 'PB', name: 'Peter Barcak', title: 'Co-Founder & Chief Executive Officer', gradient: 'from-[#7c3aed] to-[#4c1d95]', delay: 'd1' },
-                    { initials: 'MT', name: 'Michel T. Tuzo', title: 'Co-Founder & Chief Strategy Officer', gradient: 'from-[#e91e8c] to-[#be185d]', delay: 'd2' },
-                    { initials: 'MH', name: 'Marek Hoffman', title: 'Chief Operating Officer', gradient: 'from-[#06b6d4] to-[#0891b2]', delay: 'd3' },
-                    { initials: 'CF', name: 'Chrischa Furke', title: 'Chief Financial Officer', gradient: 'from-[#10b981] to-[#059669]', delay: 'd4' },
-                    { initials: 'SC', name: 'Sarah Chen', title: 'Chief Technology Officer', gradient: 'from-[#f59e0b] to-[#d97706]', delay: '' }
-                  ].map((member, i) => (
-                    <div key={i} className={`flex-shrink-0 w-[200px] text-center sr ${member.delay}`} style={{ transitionDelay: i === 4 ? '.42s' : undefined }}>
-                      <div className={`w-[100px] h-[100px] rounded-full mx-auto mb-2.5 overflow-hidden shadow-[0_4px_16px_rgba(0,0,0,.12)] flex items-center justify-center text-[32px] font-extrabold text-white bg-gradient-to-br ${member.gradient}`}>{member.initials}</div>
-                      <div className="w-[22px] h-[22px] bg-[#0077b5] rounded-md mx-auto mb-2 flex items-center justify-center">
-                        <svg viewBox="0 0 24 24" className="w-3 h-3 fill-white">
-                          <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/>
-                        </svg>
-                      </div>
-                      <div className="text-[13px] font-bold text-[#111827]">{member.name}</div>
-                      <div className="text-[11.5px] text-[#9ca3af] mt-[3px] leading-snug whitespace-pre-line">{member.title}</div>
-                    </div>
-                  ))}
+          <div className="services-grid grid grid-cols-3 gap-5 relative z-[2] lg:grid-cols-2 md:grid-cols-1">
+            {services.map((service, i) => (
+              <div
+                key={i}
+                className={`sr ${service.delay} service-card relative rounded-[20px] p-8 border overflow-hidden cursor-default transition-all duration-[0.4s] ease-[cubic-bezier(0.16,1,0.3,1)] ${service.featured ? "bg-[#f97316] border-[#f97316] featured" : "bg-white/[0.04] border-white/[0.07]"}`}
+              >
+                <div
+                  className={`font-playfair absolute top-5 right-6 text-[38px] font-extrabold leading-none ${service.featured ? "text-white/[0.18]" : "text-white/[0.06]"}`}
+                >
+                  {service.num}
                 </div>
+                <div
+                  className={`w-[50px] h-[50px] rounded-xl flex items-center justify-center text-[22px] mb-5 transition-transform duration-[0.4s] ease-[cubic-bezier(0.34,1.56,0.64,1)] sc-icon-wrap ${service.featured ? "bg-white/[0.15]" : "bg-[rgba(249,115,22,0.12)]"}`}
+                >
+                  {service.icon}
+                </div>
+                <div
+                  className={`text-[17px] font-bold mb-2.5 leading-[1.3] ${service.featured ? "text-white" : "text-white"}`}
+                >
+                  {service.title}
+                </div>
+                <div
+                  className={`text-[13px] font-normal leading-[1.75] ${service.featured ? "text-white/80" : "text-white/50"}`}
+                >
+                  {service.body}
+                </div>
+                <Link
+                  href="#"
+                  className={`inline-flex items-center gap-1.5 mt-5 text-xs font-bold tracking-[0.04em] transition-[gap] duration-300 sc-link ${service.featured ? "text-white/90" : "text-[#f97316]"}`}
+                >
+                  Learn More →
+                </Link>
+                <div
+                  className={`sc-hover-line absolute bottom-0 left-0 right-0 h-[3px] origin-left transition-transform duration-[0.4s] ease-[cubic-bezier(0.16,1,0.3,1)] scale-x-0 ${service.featured ? "bg-white/40" : "bg-[#f97316]"}`}
+                />
               </div>
-              <button onClick={() => slideTeam(1)} className="absolute top-1/2 -translate-y-1/2 -right-[18px] w-[34px] h-[34px] rounded-full bg-white border-[1.5px] border-[#e5e7eb] shadow-[0_2px_16px_rgba(0,0,0,.09)] flex items-center justify-center text-[16px] text-[#4b5563] hover:bg-[#6B21C8] hover:text-white hover:border-[#6B21C8] transition-all z-5">›</button>
-            </div>
-            <div className="flex justify-center mt-8">
-              <button className="inline-flex items-center gap-1.5 px-5 py-2 bg-[#6B21C8] text-white rounded-md text-[13px] font-bold hover:bg-[#5a18a8] hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,33,200,.32)] transition-all tracking-wide">Show team members</button>
-            </div>
-          </div>
-        </section>
-
-        {/* Offices */}
-        <section className="bg-[#5a1a9e] py-14 px-8 text-center">
-          <h2 className="text-[28px] font-extrabold text-white mb-1.5 sr">Our office locations</h2>
-          <p className="text-[13px] text-white/65 mb-9 sr d1">Where the magic happens</p>
-          <div className="max-w-[780px] mx-auto bg-white/7 rounded-[18px] p-6 relative overflow-hidden sr d2">
-            <svg className="w-full h-auto opacity-55" viewBox="0 0 900 440" fill="none">
-              <path d="M90,60 L185,52 L225,82 L248,130 L238,195 L215,248 L185,285 L148,298 L112,278 L78,245 L58,200 L65,145 Z" fill="white" opacity="0.45"/>
-              <path d="M198,20 L255,15 L275,32 L265,65 L235,78 L200,68 Z" fill="white" opacity="0.3"/>
-              <path d="M165,295 L222,288 L258,315 L272,370 L252,425 L218,435 L182,420 L158,385 L145,340 Z" fill="white" opacity="0.45"/>
-              <path d="M440,58 L510,52 L545,72 L540,115 L508,138 L462,132 L438,108 Z" fill="white" opacity="0.45"/>
-              <path d="M445,140 L518,132 L558,160 L568,235 L548,318 L516,358 L474,365 L432,332 L408,268 L415,195 L428,158 Z" fill="white" opacity="0.45"/>
-              <path d="M558,48 L720,40 L808,68 L842,112 L835,168 L778,192 L718,182 L664,192 L608,180 L568,155 L548,118 L538,72 Z" fill="white" opacity="0.45"/>
-              <path d="M695,192 L748,186 L778,210 L768,258 L738,278 L698,272 L672,248 L678,212 Z" fill="white" opacity="0.4"/>
-              <path d="M800,88 L828,82 L842,100 L834,128 L810,135 L792,120 Z" fill="white" opacity="0.35"/>
-              <path d="M748,302 L835,296 L876,322 L872,378 L835,408 L782,412 L738,385 L726,342 Z" fill="white" opacity="0.45"/>
-            </svg>
-            {[{l:53,t:38}, {l:67,t:32}, {l:74,t:44}, {l:49,t:29}].map((pos, i) => (
-              <div key={i} className="absolute w-3 h-3 rounded-full bg-[#ff5fa3] border-2 border-white map-pin-pulse" style={{left:`${pos.l}%`,top:`${pos.t}%`, animationDelay: `${i * 0.5}s`}}></div>
             ))}
           </div>
         </section>
 
-        {/* Contact */}
-        <section className="py-[68px] pb-14">
-          <div className="max-w-[1120px] mx-auto px-8">
-            <div className="sr">
-              <h2 className="text-[28px] font-extrabold text-center text-[#111827] mb-1.5">We&apos;d love to hear from you</h2>
-              <p className="text-[13px] text-[#9ca3af] text-center mb-9">Let&apos;s talk about how we can work together</p>
+        {/* ════════════════ TEAM ════════════════ */}
+        <section
+          className="team-section bg-[#f8f9fc] py-[110px] px-20 relative overflow-hidden lg:py-20 lg:px-10 md:py-16 md:px-6"
+          id="team"
+        >
+          <div className="absolute -right-[100px] top-[100px] w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(249,115,22,0.05),transparent_70%)] pointer-events-none" />
+
+          <div className="text-center mb-[70px]">
+            <div className="sr inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.2em] uppercase text-[#f97316] mb-3 justify-center">
+              <span className="w-5 h-0.5 bg-[#f97316] rounded-sm" />
+              Our Team
             </div>
-            <div className="max-w-[680px] mx-auto flex flex-col gap-3.5 sr d1">
-              <input type="text" placeholder="Name" className="w-full px-3.5 py-2.5 border-[1.5px] border-[#e5e7eb] rounded-lg text-[13.5px] text-[#111827] outline-none focus:border-[#6B21C8] focus:shadow-[0_0_0_3px_rgba(107,33,200,.1)] transition-all placeholder:text-[#9ca3af]" />
-              <input type="email" placeholder="Email" className="w-full px-3.5 py-2.5 border-[1.5px] border-[#e5e7eb] rounded-lg text-[13.5px] text-[#111827] outline-none focus:border-[#6B21C8] focus:shadow-[0_0_0_3px_rgba(107,33,200,.1)] transition-all placeholder:text-[#9ca3af]" />
-              <input type="text" placeholder="Company" className="w-full px-3.5 py-2.5 border-[1.5px] border-[#e5e7eb] rounded-lg text-[13.5px] text-[#111827] outline-none focus:border-[#6B21C8] focus:shadow-[0_0_0_3px_rgba(107,33,200,.1)] transition-all placeholder:text-[#9ca3af]" />
-              <input type="tel" placeholder="Phone" className="w-full px-3.5 py-2.5 border-[1.5px] border-[#e5e7eb] rounded-lg text-[13.5px] text-[#111827] outline-none focus:border-[#6B21C8] focus:shadow-[0_0_0_3px_rgba(107,33,200,.1)] transition-all placeholder:text-[#9ca3af]" />
-              <textarea placeholder="How can we help you?" rows={4} className="w-full px-3.5 py-2.5 border-[1.5px] border-[#e5e7eb] rounded-lg text-[13.5px] text-[#111827] outline-none focus:border-[#6B21C8] focus:shadow-[0_0_0_3px_rgba(107,33,200,.1)] transition-all placeholder:text-[#9ca3af] resize-none"></textarea>
-              <button 
-                onClick={handleSubmit}
-                className={`self-center px-7 py-3 rounded-lg text-[14px] font-bold transition-all ${submitted ? 'bg-[#22c55e] text-white' : 'bg-[#6B21C8] text-white hover:bg-[#5a18a8] hover:-translate-y-px hover:shadow-[0_4px_16px_rgba(107,33,200,.3)] active:scale-[0.98]'}`}
+            <h2 className="sr d1 font-playfair font-bold text-[clamp(34px,3.5vw,52px)] leading-[1.08] tracking-[-0.02em] text-[#0d1b3e] mb-3">
+              Meet <em className="italic text-[#f97316]">Our People</em>
+            </h2>
+            <p className="sr d2 text-[15px] font-normal leading-[1.85] text-[#64748b] max-w-[500px] mx-auto">
+              The brilliant minds behind FalconTech — passionate, driven, and
+              committed to your success.
+            </p>
+          </div>
+
+          <div className="team-grid grid grid-cols-3 gap-6 lg:grid-cols-2 md:grid-cols-1">
+            {team.map((member, i) => (
+              <div
+                key={i}
+                className={`sr ${member.delay} team-card bg-white rounded-[20px] max-w-[600px] overflow-hidden border border-[#e2e8f0] transition-all duration-[0.45s] ease-[cubic-bezier(0.16,1,0.3,1)] cursor-default relative ${member.featured ? "bg-[#0d1b3e] featured" : ""} ${member.wide ? "col-span-2 lg:col-span-1 team-wide" : ""}`}
               >
-                {submitted ? '✓ Message sent!' : 'Submit'}
-              </button>
-            </div>
+                <div className="w-full  h-[248px] overflow-hidden relative">
+                  <div
+                    className={`${member.img} w-full h-full flex items-center justify-center text-[10px] font-semibold tracking-[0.15em] uppercase tc-img-ph`}
+                  >
+                    Photo
+                  </div>
+                  <div className="tc-img-overlay absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[rgba(13,27,62,0.4)] opacity-0 transition-opacity duration-[0.4s]" />
+                  <div className="absolute top-3.5 right-3.5 bg-black/20 backdrop-blur-md text-white/75 text-[10px] font-bold tracking-[0.12em] px-2.5 py-1 rounded-full">
+                    {String(i + 1).padStart(2, "0")}
+                  </div>
+                </div>
+                <div className="p-5 pb-5">
+                  <div
+                    className={`font-playfair text-[19px] font-bold mb-1 ${member.featured ? "text-white" : "text-[#0d1b3e]"}`}
+                  >
+                    {member.name}
+                  </div>
+                  <div className="text-[11px] font-bold tracking-[0.14em] uppercase text-[#f97316] mb-3 flex items-center gap-1.5">
+                    <span className="w-3.5 h-[1.5px] bg-[#f97316]" />
+                    {member.role}
+                  </div>
+                  <div
+                    className={`text-[13px] font-normal leading-[1.75] line-clamp-3 ${member.featured ? "text-white/55" : "text-[#64748b]"}`}
+                  >
+                    {member.bio}
+                  </div>
+                  <div className="flex gap-2 mt-4">
+                    {["in", "tw", "gh"].map((social, j) => (
+                      <Link
+                        key={j}
+                        href="#"
+                        className={`w-[30px] h-[30px] rounded-full border flex items-center justify-center text-[11px] font-bold transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] no-underline ${member.featured ? "border-white/[0.15] text-white/60 hover:bg-[#f97316] hover:border-[#f97316] hover:text-white hover:scale-[1.15]" : "border-[#e2e8f0] text-[#0d1b3e] hover:bg-[#f97316] hover:border-[#f97316] hover:text-white hover:scale-[1.15]"}`}
+                      >
+                        {social}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+                <div className="tc-bar absolute bottom-0 left-0 right-0 h-[3px] bg-[#f97316] origin-left transition-transform duration-[0.4s] ease-[cubic-bezier(0.16,1,0.3,1)] scale-x-0" />
+              </div>
+            ))}
           </div>
         </section>
 
-        {/* CTA Banner */}
-        <section className="bg-[#f9fafb] border-t border-[#e5e7eb] py-[52px] px-8 text-center">
-          <div className="sr">
-            <h3 className="text-[22px] font-extrabold text-[#111827] mb-2">Unlock the Power of Behavioural Insights and Scores</h3>
-            <p className="text-[13px] text-[#6b7280] mb-5 max-w-[540px] mx-auto">See how CredoLab can help your business make better lending decisions, prevent fraud, and protect against financial crime.</p>
-            <div className="flex items-center justify-center gap-3 flex-wrap mb-2.5">
-              <button className="inline-flex items-center gap-1.5 px-5 py-2 bg-[#6B21C8] text-white rounded-md text-[13px] font-bold hover:bg-[#5a18a8] hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,33,200,.32)] transition-all tracking-wide">Get a Demo</button>
-              <input type="email" placeholder="Sign up for our newsletter" className="px-4 py-2.5 border-[1.5px] border-[#e5e7eb] rounded-md text-[13px] outline-none focus:border-[#6B21C8] transition-all w-[220px] placeholder:text-[#9ca3af]" />
-              <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-transparent text-[#6B21C8] border-[1.5px] border-[#6B21C8] rounded-md text-[13px] font-bold hover:bg-[rgba(107,33,200,.06)] transition-all tracking-wide">Subscribe</button>
+        {/* ════════════════ FAQ ════════════════ */}
+        <section
+          className="faq-section faq-grid grid grid-cols-[400px_1fr] gap-20 items-start py-[110px] px-20 bg-white lg:grid-cols-1 lg:py-20 lg:px-10 md:py-16 md:px-6"
+          id="faq"
+        >
+          <div>
+            <div className="sr inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.2em] uppercase text-[#f97316] mb-4">
+              <span className="w-5 h-0.5 bg-[#f97316] rounded-sm" />
+              Why Choose Us
             </div>
-            <div className="flex gap-2.5 items-center flex-wrap justify-center mt-2.5">
-              {['🔒 GDPR', '🏅 ISO 27001', '🛡 PDPA', '📋 LGPD'].map((badge, i) => (
-                <span key={i} className="text-[10.5px] font-bold text-[#9ca3af] flex items-center gap-1">{badge}</span>
-              ))}
+            <h2 className="sr d1 font-playfair font-bold text-[clamp(32px,3vw,46px)] leading-[1.1] tracking-[-0.02em] text-[#0d1b3e] mb-4">
+              Why Choose
+              <br />
+              <em className="italic text-[#f97316]">Falcon Tech Nepal?</em>
+            </h2>
+            <p className="sr d2 text-[15px] leading-[1.8] text-[#64748b] mb-9">
+              Everything you need to know about us, our services and how we work
+              to drive real, measurable results for your business.
+            </p>
+            <div className="sr d3 faq-visual w-full aspect-[4/3] rounded-[20px] overflow-hidden shadow-[0_16px_40px_rgba(13,27,62,0.1)] lg:hidden">
+              <div className="ph-navy2 w-full h-full flex items-center justify-center text-[10px] font-semibold tracking-[0.15em] uppercase">
+                Our Team
+              </div>
             </div>
+          </div>
+
+          <div className="sr d1 flex flex-col gap-0">
+            {faqs.map((faq, i) => (
+              <div
+                key={i}
+                className={`faq-item border-b border-[#e2e8f0] overflow-hidden ${i === 0 ? "border-t" : ""} ${openFaq === i ? "open" : ""}`}
+              >
+                <div
+                  className="flex justify-between items-center py-5 gap-5 cursor-pointer text-[15px] font-semibold text-[#0d1b3e] transition-colors duration-300 hover:text-[#f97316]"
+                  onClick={() => toggleFaq(i)}
+                >
+                  {faq.q}
+                  <div
+                    className={`w-[30px] h-[30px] rounded-full border-[1.5px] border-[#e2e8f0] flex items-center justify-center text-[15px] text-[#64748b] flex-shrink-0 transition-all duration-[0.35s] ease-[cubic-bezier(0.16,1,0.3,1)] ${openFaq === i ? "bg-[#f97316] border-[#f97316] text-white rotate-45" : ""}`}
+                  >
+                    +
+                  </div>
+                </div>
+                <div
+                  className={`overflow-hidden transition-[max-height] duration-[0.45s] ease-[cubic-bezier(0.16,1,0.3,1)] ${openFaq === i ? "max-h-[160px]" : "max-h-0"}`}
+                >
+                  <div className="pb-4.5 text-sm leading-[1.8] text-[#64748b]">
+                    {faq.a}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
-        
+        {/* ════════════════ CTA ════════════════ */}
+        <div className="cta-grid grid grid-cols-2 lg:grid-cols-1">
+          <div className="cta-navy sr bg-[#162852] px-[70px] py-20 relative overflow-hidden lg:px-10 lg:py-16 md:px-7 md:py-12">
+            <div className="absolute -bottom-[70px] -right-[70px] w-[250px] h-[250px] rounded-full border-[44px] border-white/[0.04]" />
+            <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/45 mb-3.5">
+              Ready To Get Started?
+            </div>
+            <div className="font-playfair font-bold text-[clamp(32px,3vw,46px)] text-white leading-[1.1] tracking-[-0.02em] mb-4">
+              Build With
+              <br />
+              The Best.
+            </div>
+            <p className="text-sm leading-[1.8] text-white/60 mb-9">
+              Join thousands of businesses who trust FalconTech to turn their
+              boldest ideas into powerful digital products that actually
+              perform.
+            </p>
+            <Link
+              href="#"
+              className="inline-flex items-center gap-2 bg-white text-[#0d1b3e] px-7 py-3 rounded-full text-[13px] font-bold no-underline transition-all duration-300 relative z-[2] hover:bg-[#f8f9fc] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.15)]"
+            >
+              Get Started
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+          <div className="cta-orange sr d1 bg-[#f97316] px-[70px] py-20 relative overflow-hidden lg:px-10 lg:py-16 md:px-7 md:py-12">
+            <div className="absolute -top-20 -left-20 w-[300px] h-[300px] rounded-full border-[55px] border-white/[0.07]" />
+            <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/45 mb-3.5">
+              Join Our Community
+            </div>
+            <div className="font-playfair font-bold text-[clamp(32px,3vw,46px)] text-white leading-[1.1] tracking-[-0.02em] mb-4">
+              Ready To
+              <br />
+              Join Us?
+            </div>
+            <p className="text-sm leading-[1.8] text-white/[0.84] mb-9">
+              Exciting opportunities await ambitious, driven minds. Follow our
+              journey and discover what it truly means to work at FalconTech.
+            </p>
+            <Link
+              href="#"
+              className="inline-flex items-center gap-2 border-2 border-white/45 text-white px-7 py-3 rounded-full text-[13px] font-bold no-underline transition-all duration-300 relative z-[2] hover:bg-white/[0.12] hover:border-white hover:-translate-y-0.5"
+            >
+              Explore Careers
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+        </div>
       </div>
     </>
   );

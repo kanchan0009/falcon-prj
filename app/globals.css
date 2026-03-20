@@ -1,4 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Manrope:wght@300;400;500;600;700;800&display=swap");
+
 @import "tailwindcss";
+
+.font-playfair {
+  font-family: "Playfair Display", serif;
+}
+.font-manrope {
+  font-family: "Manrope", sans-serif;
+}
+nav {
+  min-height: 4rem; /* matches h-16 */
+  height: 4rem !important;
+  max-height: 5rem; /* matches md:h-20 */
+  font-size: 1rem;
+  line-height: 1; /* prevents text shrinking */
+}
 
 :root {
   --font-geist-sans: ui-sans-serif, system-ui;

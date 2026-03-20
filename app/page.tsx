@@ -7,13 +7,14 @@ export default function AIConsultingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [caseIdx, setCaseIdx] = useState(0);
   const [activeStep, setActiveStep] = useState(1);
+  const [activeExpert, setActiveExpert] = useState(null);
   const [counts, setCounts] = useState({
     consultants: 0,
     satisfaction: 0,
     cases: 0,
   });
   const countsRef = useRef({ consultants: 200, satisfaction: 100, cases: 1 });
-  const caseTrackRef = useRef<HTMLDivElement>(null);
+  const caseTrackRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -30,7 +31,7 @@ export default function AIConsultingPage() {
           }
         });
       },
-      { threshold: 0.1, rootMargin: "0px 0px -36px 0px" },
+      { threshold: 0.1, rootMargin: "0px 0px -36px 0px" }
     );
     srEls.forEach((el) => srObs.observe(el));
 
@@ -41,21 +42,21 @@ export default function AIConsultingPage() {
         entries.forEach((e) => {
           if (e.isIntersecting) {
             const target = parseInt(
-              e.target.getAttribute("data-target") || "0",
+              e.target.getAttribute("data-target") || "0"
             );
             animateCount(
               target,
               e.target.classList.contains("consultants")
                 ? "consultants"
                 : e.target.classList.contains("satisfaction")
-                  ? "satisfaction"
-                  : "cases",
+                ? "satisfaction"
+                : "cases"
             );
             countObs.unobserve(e.target);
           }
         });
       },
-      { threshold: 0.5 },
+      { threshold: 0.5 }
     );
     countEls.forEach((el) => countObs.observe(el));
 
@@ -72,13 +73,10 @@ export default function AIConsultingPage() {
     };
   }, []);
 
-  const animateCount = (
-    target: number,
-    key: "consultants" | "satisfaction" | "cases",
-  ) => {
+  const animateCount = (target, key) => {
     const duration = 1800;
     const start = performance.now();
-    const update = (now: number) => {
+    const update = (now) => {
       const elapsed = now - start;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
@@ -89,24 +87,17 @@ export default function AIConsultingPage() {
     requestAnimationFrame(update);
   };
 
-  const slideCase = (dir: number) => {
-    setCaseIdx((prev) => {
-      const newIdx = (prev + dir + 2) % 2;
-      return newIdx;
-    });
-  };
-
-  const goCase = (i: number) => setCaseIdx(i);
-
-  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleCardMouseMove = (e) => {
     const card = e.currentTarget;
     const rect = card.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
-    card.style.transform = `translateY(-5px) rotateX(${-y * 5}deg) rotateY(${x * 5}deg)`;
+    card.style.transform = `translateY(-5px) rotateX(${-y * 5}deg) rotateY(${
+      x * 5
+    }deg)`;
   };
 
-  const handleCardMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleCardMouseLeave = (e) => {
     e.currentTarget.style.transform = "";
   };
 
@@ -129,30 +120,22 @@ export default function AIConsultingPage() {
         .sr {
           opacity: 0;
           transform: translateY(32px);
-          transition:
-            opacity 0.7s ease,
-            transform 0.7s ease;
+          transition: opacity 0.7s ease, transform 0.7s ease;
         }
         .sr-l {
           opacity: 0;
           transform: translateX(-36px);
-          transition:
-            opacity 0.7s ease,
-            transform 0.7s ease;
+          transition: opacity 0.7s ease, transform 0.7s ease;
         }
         .sr-r {
           opacity: 0;
           transform: translateX(36px);
-          transition:
-            opacity 0.7s ease,
-            transform 0.7s ease;
+          transition: opacity 0.7s ease, transform 0.7s ease;
         }
         .sr-scale {
           opacity: 0;
           transform: scale(0.88);
-          transition:
-            opacity 0.6s ease,
-            transform 0.6s ease;
+          transition: opacity 0.6s ease, transform 0.6s ease;
         }
         .sr.in,
         .sr-l.in,
@@ -191,10 +174,7 @@ export default function AIConsultingPage() {
         }
 
         .service-card {
-          transition:
-            transform 0.28s,
-            box-shadow 0.28s,
-            border-color 0.28s;
+          transition: transform 0.28s, box-shadow 0.28s, border-color 0.28s;
         }
         .service-card::before {
           content: "";
@@ -239,48 +219,19 @@ export default function AIConsultingPage() {
           color: #e84a1a;
         }
 
-        .case-card {
-          transition: box-shadow 0.28s;
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
         }
-        .case-card:hover {
-          box-shadow: 0 6px 28px rgba(0, 0, 0, 0.12);
-        }
-
-        .case-dot {
-          transition:
-            background 0.22s,
-            transform 0.22s;
-        }
-        .case-dot.active {
-          background: #e84a1a;
-          transform: scale(1.3);
-        }
-
-        .footer-social {
-          transition:
-            background 0.2s,
-            transform 0.2s;
-        }
-        .footer-social:hover {
-          background: #e84a1a;
-          transform: translateY(-2px);
-        }
-
-        .case-nav-btn {
-          transition: all 0.22s;
-        }
-        .case-nav-btn:hover {
-          background: #e84a1a;
-          border-color: #e84a1a;
-          color: #fff;
-          transform: scale(1.08);
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}</style>
 
       <div className="bg-white text-[#1a1a2e] text-[15px] leading-relaxed overflow-x-hidden">
         {/* Hero */}
         <section
-          className="relative min-h-screen flex items-center pt-[66px] overflow-hidden"
+          className="relative min-h-[400px] flex items-center pt-[66px] overflow-hidden"
           style={{
             background: `linear-gradient(to right, rgba(8,15,35,.92) 42%, rgba(8,15,35,.55) 100%), url('https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1600&q=80') center/cover no-repeat`,
           }}
@@ -305,13 +256,13 @@ export default function AIConsultingPage() {
           <div className="max-w-[1180px] mx-auto px-9 relative z-[2] w-full">
             <div className="grid grid-cols-2 items-center gap-12">
               <div>
-                <div className="inline-flex items-center gap-2 text-[32px] font-bold  tracking-widest uppercase text-[#E84A1A] mb-4.5 sr">
+                <div className="inline-flex items-center gap-2 text-[32px] font-bold tracking-widest uppercase text-[#E84A1A] mb-4 sr">
                   <span className="w-8 h-0.5 bg-[#E84A1A] rounded-sm"></span>
                   FALCON
                   <span className="w-8 h-0.5 bg-[#E84A1A] rounded-sm"></span>
                 </div>
                 <h1 className="font-['Barlow_Condensed'] text-[68px] font-black text-white leading-none mb-5 tracking-tight sr d1">
-                  Don’t Just Market
+                  Don't Just Market
                   <br />
                   <span className="text-[#E84A1A]">Dominate</span>
                 </h1>
@@ -334,28 +285,6 @@ export default function AIConsultingPage() {
                   }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[rgba(13,27,62,.7)]"></div>
-                  {/* Grid letters */}
-                  <div className="absolute top-3 left-0 right-0 flex justify-around px-5">
-                    {["A", "B", "C"].map((l) => (
-                      <span
-                        key={l}
-                        className="text-[11px] font-bold text-white/35 tracking-wide"
-                      >
-                        {l}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="absolute top-12 left-0 right-0 flex justify-around px-5">
-                    {["D", "E", "F"].map((l) => (
-                      <span
-                        key={l}
-                        className="text-[11px] font-bold text-white/35 tracking-wide"
-                      >
-                        {l}
-                      </span>
-                    ))}
-                  </div>
-                  {/* AI label */}
                   <div className="absolute top-5 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg px-5 py-2 text-white text-[13px] font-bold tracking-wide uppercase whitespace-nowrap">
                     <span className="font-['Barlow_Condensed'] text-[20px] font-black mr-2">
                       AI
@@ -363,7 +292,6 @@ export default function AIConsultingPage() {
                     Artificial Intelligence
                   </div>
                 </div>
-                {/* Floating badge */}
                 <div className="absolute top-8 right-0 bg-white/7 backdrop-blur-md border border-white/12 rounded-[14px] px-6 py-4 text-center">
                   <div className="font-['Barlow_Condensed'] text-[48px] font-black text-white leading-none">
                     AI
@@ -405,7 +333,11 @@ export default function AIConsultingPage() {
             ].map((stat, i) => (
               <div
                 key={i}
-                className={`text-center relative ${i > 0 ? 'before:content-[""] before:absolute before:left-0 before:top-[15%] before:bottom-[15%] before:w-px before:bg-white/12' : ""}`}
+                className={`text-center relative ${
+                  i > 0
+                    ? 'before:content-[""] before:absolute before:left-0 before:top-[15%] before:bottom-[15%] before:w-px before:bg-white/12'
+                    : ""
+                }`}
               >
                 <div className="mx-auto mb-2.5 w-10 h-10">
                   <svg
@@ -420,9 +352,7 @@ export default function AIConsultingPage() {
                       </>
                     )}
                     {stat.icon === "star" && (
-                      <>
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                      </>
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     )}
                     {stat.icon === "briefcase" && (
                       <>
@@ -439,8 +369,8 @@ export default function AIConsultingPage() {
                       stat.key === "consultants"
                         ? 200
                         : stat.key === "satisfaction"
-                          ? 100
-                          : 1
+                        ? 100
+                        : 1
                     }
                   >
                     {stat.value}
@@ -531,7 +461,7 @@ export default function AIConsultingPage() {
                   <br />
                   <br />
                   Most importantly, the launch of your website is not the finish
-                  line, it’s the beginning. We support our clients, helping them
+                  line, it's the beginning. We support our clients, helping them
                   test, interpret data and continue to evolve with their market.
                 </h2>
                 <div className="w-12 h-[3px] bg-[#E84A1A] rounded-sm my-2.5"></div>
@@ -586,7 +516,7 @@ export default function AIConsultingPage() {
                 ].map((service, i) => (
                   <div
                     key={i}
-                    className={`bg-white border-[1.5px] border-[#e1e5ec] rounded-xl p-7 shadow-[0_2px_12px_rgba(0,0,0,.08)] relative overflow-hidden hover:-translate-y-[5px] hover:shadow-[0_6px_28px_rgba(0,0,0,.12)] sr ${service.delay}`}
+                    className={`service-card bg-white border-[1.5px] border-[#e1e5ec] rounded-xl p-7 shadow-[0_2px_12px_rgba(0,0,0,.08)] relative overflow-hidden hover:-translate-y-[5px] hover:shadow-[0_6px_28px_rgba(0,0,0,.12)] sr ${service.delay}`}
                     onMouseMove={handleCardMouseMove}
                     onMouseLeave={handleCardMouseLeave}
                   >
@@ -599,9 +529,7 @@ export default function AIConsultingPage() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         className="w-12 h-12"
-                      >
-                        {/* your icons here */}
-                      </svg>
+                      ></svg>
                     </div>
 
                     <div className="text-[16px] font-extrabold text-[#0d1b3e] mb-2 leading-tight whitespace-pre-line">
@@ -630,55 +558,170 @@ export default function AIConsultingPage() {
                 Credibly innovate granular internal or organic sources
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-9">
-              {[
-                {
-                  initials: "SD",
-                  name: "Saskia Daly",
-                  title: "Founder",
-                  gradient: "from-[#1a2d5a] to-[#2d4a8a]",
-                  delay: "d1",
-                  align: "l",
-                },
-                {
-                  initials: "SW",
-                  name: "Shayne Wallace",
-                  title: "IT Manager",
-                  gradient: "from-[#2d4a8a] to-[#3a5fa0]",
-                  delay: "d2",
-                  align: "",
-                },
-                {
-                  initials: "NA",
-                  name: "Niko Anderson",
-                  title: "CTO",
-                  gradient: "from-[#4a5568] to-[#6b7a94]",
-                  delay: "d3",
-                  align: "r",
-                },
-              ].map((expert, i) => (
-                <div
-                  key={i}
-                  className={`text-center expert-card sr${expert.align ? "-" + expert.align : ""} ${expert.delay}`}
+
+            <div className="relative group">
+              <button
+                onClick={() => {
+                  const container = document.getElementById("expert-carousel");
+                  container?.scrollBy({ left: -280, behavior: "smooth" });
+                }}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-[#E84A1A] hover:bg-[#E84A1A] hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 cursor-pointer"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <div className="w-[180px] h-[180px] rounded-full mx-auto mb-4.5 overflow-hidden shadow-[0_10px_36px_rgba(0,0,0,.14)] border-4 border-white outline-[3px] outline-[#e1e5ec] expert-photo">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+
+              <button
+                onClick={() => {
+                  const container = document.getElementById("expert-carousel");
+                  container?.scrollBy({ left: 280, behavior: "smooth" });
+                }}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-[#E84A1A] hover:bg-[#E84A1A] hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 cursor-pointer"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+
+              <div
+                id="expert-carousel"
+                className="flex gap-6 overflow-x-auto scroll-smooth pb-4 scrollbar-hide"
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              >
+                {[
+                  {
+                    initials: "SD",
+                    name: "Saskia Daly",
+                    title: "Founder",
+                    gradient: "from-[#1a2d5a] to-[#2d4a8a]",
+                    delay: "d1",
+                    description:
+                      "Visionary leader with 15+ years of experience in strategic planning and business development. Passionate about driving innovation and building high-performance teams.",
+                  },
+                  {
+                    initials: "SW",
+                    name: "Shayne Wallace",
+                    title: "IT Manager",
+                    gradient: "from-[#2d4a8a] to-[#3a5fa0]",
+                    delay: "d2",
+                    description:
+                      "Technology expert specializing in cloud infrastructure and cybersecurity. Led digital transformation initiatives for Fortune 500 companies.",
+                  },
+                  {
+                    initials: "NA",
+                    name: "Niko Anderson",
+                    title: "CTO",
+                    gradient: "from-[#4a5568] to-[#6b7a94]",
+                    delay: "d3",
+                    description:
+                      "Chief Technology Officer with deep expertise in AI/ML, software architecture, and emerging technologies. Former tech lead at major Silicon Valley firms.",
+                  },
+                  {
+                    initials: "EM",
+                    name: "Emma Mitchell",
+                    title: "Design Lead",
+                    gradient: "from-[#E84A1A] to-[#ff6b3d]",
+                    delay: "d4",
+                    description:
+                      "Creative director with award-winning portfolio in UX/UI design. Specializes in creating intuitive digital experiences that drive user engagement.",
+                  },
+                  {
+                    initials: "JR",
+                    name: "James Rodriguez",
+                    title: "Marketing Director",
+                    gradient: "from-[#0d1b3e] to-[#1a2d5a]",
+                    delay: "d5",
+                    description:
+                      "Results-driven marketing strategist with proven track record in brand growth and digital marketing campaigns across global markets.",
+                  },
+                  {
+                    initials: "LC",
+                    name: "Lisa Chen",
+                    title: "Operations Manager",
+                    gradient: "from-[#6b7a94] to-[#8b9aae]",
+                    delay: "d6",
+                    description:
+                      "Operations excellence expert focused on process optimization and supply chain management. Certified Six Sigma Black Belt.",
+                  },
+                ].map((expert, i) => (
+                  <div
+                    key={i}
+                    className={`flex-shrink-0 w-[calc(25%-18px)] min-w-[220px] text-center expert-card sr${expert.delay}`}
+                  >
                     <div
-                      className={`w-full h-full flex items-center justify-center font-['Barlow_Condensed'] text-[52px] font-black text-white bg-gradient-to-br ${expert.gradient}`}
+                      className="relative group/card cursor-pointer"
+                      onClick={() =>
+                        setActiveExpert(activeExpert === i ? null : i)
+                      }
                     >
-                      {expert.initials}
+                      <div className="w-full aspect-square rounded-[20px] mx-auto mb-4 overflow-hidden shadow-[0_10px_36px_rgba(0,0,0,.14)] border-4 border-white outline-[3px] outline-[#e1e5ec] expert-photo transition-all duration-300 group-hover/card:shadow-[0_15px_50px_rgba(232,74,26,0.2)] group-hover/card:outline-[#E84A1A]">
+                        <div
+                          className={`w-full h-full flex items-center justify-center font-['Barlow_Condensed'] text-[52px] font-black text-white bg-gradient-to-br ${expert.gradient} transition-transform duration-300 group-hover/card:scale-105`}
+                        >
+                          {expert.initials}
+                        </div>
+                      </div>
+
+                      <div
+                        className={`absolute -bottom-2 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[#E84A1A] transition-all duration-300 ${
+                          activeExpert === i
+                            ? "opacity-100 scale-100"
+                            : "opacity-0 scale-0"
+                        }`}
+                      ></div>
+                    </div>
+
+                    <div
+                      className={`text-[16px] font-extrabold mb-1 transition-colors duration-300 cursor-pointer ${
+                        activeExpert === i ? "text-[#E84A1A]" : "text-[#0d1b3e]"
+                      }`}
+                      onClick={() =>
+                        setActiveExpert(activeExpert === i ? null : i)
+                      }
+                    >
+                      {expert.name}
+                    </div>
+                    <div className="text-[13px] text-[#E84A1A] font-semibold mb-3">
+                      {expert.title}
+                    </div>
+
+                    <div
+                      className={`text-[13px] text-[#6b7a94] leading-relaxed transition-all duration-400 overflow-hidden text-left bg-[#f8f9fa] rounded-lg px-4 ${
+                        activeExpert === i
+                          ? "max-h-[200px] opacity-100 py-3 mt-2"
+                          : "max-h-0 opacity-0 py-0 mt-0"
+                      }`}
+                    >
+                      {expert.description}
                     </div>
                   </div>
-                  <div className="text-[16px] font-extrabold text-[#0d1b3e] mb-1">
-                    {expert.name}
-                  </div>
-                  <div className="text-[13px] text-[#E84A1A] font-semibold">
-                    {expert.title}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </section>
+
         {/* Process */}
         <section className="py-[90px] bg-[#f8f9fa]">
           <div className="max-w-[1180px] mx-auto px-9">
@@ -689,44 +732,54 @@ export default function AIConsultingPage() {
               <div className="w-12 h-[3px] bg-[#E84A1A] rounded-sm mx-auto my-2.5"></div>
             </div>
 
-            <div className="grid grid-cols-3 gap-0 mt-13 relative">
-              {/* Connector line */}
-              <div className="absolute top-[38px] left-[calc(16.66%+8px)] right-[calc(16.66%+8px)] h-0.5 bg-[#e1e5ec] z-0"></div>
+            <div className="grid grid-cols-5 gap-0 mt-13 relative">
+              <div className="absolute top-[38px] left-[calc(10%+8px)] right-[calc(10%+8px)] h-0.5 bg-[#e1e5ec] z-0"></div>
 
               {[
                 { num: "01", title: "Step 1", align: "l", delay: "d1" },
+                { num: "02", title: "Step 2", align: "", delay: "d2" },
                 {
-                  num: "02",
-                  title: "Step 2",
+                  num: "03",
+                  title: "Step 3",
                   align: "",
-                  delay: "d2",
+                  delay: "d3",
                   active: true,
                 },
-                { num: "03", title: "Step 3", align: "r", delay: "d3" },
+                { num: "04", title: "Step 4", align: "", delay: "d4" },
+                { num: "05", title: "Step 5", align: "r", delay: "d5" },
               ].map((step, i) => (
                 <div
                   key={i}
-                  className={`text-center relative z-[1] px-6 process-step sr${step.align ? "-" + step.align : ""} ${step.delay}`}
+                  className={`text-center relative z-[1] px-6 process-step sr${
+                    step.align ? "-" + step.align : ""
+                  } ${step.delay}`}
                   onMouseEnter={() => setActiveStep(i)}
-                  onMouseLeave={() => setActiveStep(i)} // keeps active while hovered
+                  onMouseLeave={() => setActiveStep(i)}
                 >
                   <div className="font-['Barlow_Condensed'] text-[64px] font-black text-[#e1e5ec] leading-none mb-2 relative inline-block transition-colors process-num">
                     {step.num}
                   </div>
 
                   <div
-                    className={`w-4 h-4 rounded-full border-[3px] border-white mx-auto mb-4 transition-all process-step-dot ${activeStep === i ? "bg-[#E84A1A] shadow-[0_0_0_4px_rgba(232,74,26,.22)]" : "bg-[#e1e5ec] shadow-[0_0_0_2px_#e1e5ec]"}`}
+                    className={`w-4 h-4 rounded-full border-[3px] border-white mx-auto mb-4 transition-all process-step-dot ${
+                      activeStep === i
+                        ? "bg-[#E84A1A] shadow-[0_0_0_4px_rgba(232,74,26,.22)]"
+                        : "bg-[#e1e5ec] shadow-[0_0_0_2px_#e1e5ec]"
+                    }`}
                   ></div>
 
                   <div
-                    className={`text-[18px] font-extrabold mb-2.5 transition-colors process-step-title ${activeStep === i ? "text-[#E84A1A]" : "text-[#0d1b3e]"}`}
+                    className={`text-[18px] font-extrabold mb-2.5 transition-colors process-step-title ${
+                      activeStep === i ? "text-[#E84A1A]" : "text-[#0d1b3e]"
+                    }`}
                   >
                     {step.title}
                   </div>
 
-                  {/* DETAIL TEXT */}
                   <div
-                    className={`text-[13.5px] text-[#6b7a94] leading-relaxed transition-all duration-300 overflow-hidden ${activeStep === i ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
+                    className={`text-[13.5px] text-[#6b7a94] leading-relaxed transition-all duration-300 overflow-hidden ${
+                      activeStep === i ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                    }`}
                   >
                     Lorem ipsum dolor sit amet, consecte adipiscing elit, sed
                     eiusmod tempor incididunt labore et dolore magna aliqua
@@ -734,156 +787,6 @@ export default function AIConsultingPage() {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Case Studies */}
-        <section className="py-[90px] pb-[100px]">
-          <div className="max-w-[1180px] mx-auto px-9">
-            <div className="text-center mb-13 sr">
-              <h2 className="font-['Barlow_Condensed'] text-[46px] font-black text-[#0d1b3e] leading-tight mb-1">
-                Case Studies
-              </h2>
-              <div className="w-12 h-[3px] bg-[#E84A1A] rounded-sm mx-auto my-2.5"></div>
-            </div>
-            <div className="relative sr d1">
-              <div className="overflow-hidden">
-                <div
-                  ref={caseTrackRef}
-                  className="flex gap-7 transition-transform duration-[450ms]"
-                  style={{
-                    transform: `translateX(-${caseIdx * (caseTrackRef.current?.parentElement?.offsetWidth ? caseTrackRef.current.parentElement.offsetWidth + 28 : 0)}px)`,
-                  }}
-                >
-                  {[
-                    {
-                      tag: "AI Platform",
-                      title: "AI-Based Art Generator\nPlatform",
-                      body: "An AI-Based Art Generator Platform uses advanced algorithms to create unique, stunning artworks, revolutionising the digital art creation process.",
-                      faces: ["👩‍🎨", "🎨", "🤖", "✨"],
-                      explore: "Explore AI Art Generation",
-                      tabletColors: ["#fde68a,#f59e0b", "#3b82f6"],
-                    },
-                    {
-                      tag: "Automation",
-                      title: "Intelligent Process\nAutomation Suite",
-                      body: "A comprehensive automation platform leveraging machine learning to streamline business workflows and reduce operational overhead by up to 70%.",
-                      faces: ["⚙️", "📊", "🔄", "📈"],
-                      explore: "Real-time Process Monitor",
-                      tabletColors: ["#fde68a,#f59e0b", "#f9a8d4,#ec4899"],
-                    },
-                  ].map((caseStudy, i) => (
-                    <div
-                      key={i}
-                      className="flex-shrink-0 w-[calc(100%-56px)] border-[1.5px] border-[#e1e5ec] rounded-[18px] grid grid-cols-2 gap-0 overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,.08)] case-card"
-                    >
-                      <div className="p-10">
-                        <div className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase text-[#E84A1A] mb-4">
-                          <span className="w-6 h-0.5 bg-[#E84A1A]"></span>
-                          {caseStudy.tag}
-                        </div>
-                        <h3 className="font-['Barlow_Condensed'] text-[32px] font-black text-[#0d1b3e] leading-tight mb-4 whitespace-pre-line">
-                          {caseStudy.title}
-                        </h3>
-                        <p className="text-[14px] text-[#6b7a94] leading-relaxed mb-6 max-w-[400px]">
-                          {caseStudy.body}
-                        </p>
-                        <a
-                          href="#"
-                          className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[#E84A1A] hover:gap-2.5 transition-all"
-                        >
-                          Read more
-                          <svg
-                            viewBox="0 0 24 24"
-                            className="w-4 h-4 stroke-current fill-none stroke-[2.5] stroke-linecap-round"
-                          >
-                            <path d="M5 12h14M12 5l7 7-7 7" />
-                          </svg>
-                        </a>
-                      </div>
-                      <div className="bg-[#f8f9fa] flex items-center justify-center p-7 min-h-[320px] relative">
-                        {/* Mock laptop */}
-                        <div className="w-full max-w-[340px] relative">
-                          <div className="bg-[#0d1b3e] rounded-t-[10px] p-1.5 shadow-[0_8px_40px_rgba(0,0,0,.25)]">
-                            <div className="bg-white rounded-t-md overflow-hidden min-h-[180px] p-4">
-                              <div className="flex items-center gap-1.5 mb-3">
-                                <div className="w-2 h-2 rounded-full bg-[#ff5f57]"></div>
-                                <div className="w-2 h-2 rounded-full bg-[#ffbd2e]"></div>
-                                <div className="w-2 h-2 rounded-full bg-[#28ca41]"></div>
-                                <div className="flex-1 h-4 bg-[#f0f2f5] rounded flex items-center px-2 text-[9px] text-[#9ba8be] overflow-hidden">
-                                  Explore More AI Tools
-                                </div>
-                              </div>
-                              <div className="text-[11px] font-extrabold text-[#0d1b3e] mb-2">
-                                Explore More AI Tools
-                              </div>
-                              <div className="grid grid-cols-4 gap-1.5 mb-2">
-                                {caseStudy.faces.map((face, j) => (
-                                  <div
-                                    key={j}
-                                    className="aspect-square rounded-lg overflow-hidden flex items-center justify-center text-[20px] bg-gradient-to-br from-[#fde68a] to-[#f59e0b]"
-                                  >
-                                    {face}
-                                  </div>
-                                ))}
-                              </div>
-                              <div className="text-[9px] font-bold text-[#0d1b3e] mb-1.5">
-                                {caseStudy.explore}
-                              </div>
-                              <div className="flex gap-1">
-                                <div className="text-[8px] font-bold px-2 py-1 rounded bg-[#E84A1A] text-white">
-                                  Get Started
-                                </div>
-                                <div className="text-[8px] font-bold px-2 py-1 rounded bg-[#0d1b3e] text-white">
-                                  Learn More
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="bg-[#e1e5ec] h-2.5 rounded-b-lg"></div>
-                          <div className="w-[40%] h-3.5 bg-[#e1e5ec] mx-auto rounded-b-md"></div>
-                          {/* Tablet overlay */}
-                          <div className="absolute -bottom-5 -right-5 w-[120px] bg-[#0d1b3e] rounded-lg p-1.5 shadow-[0_8px_28px_rgba(0,0,0,.3)]">
-                            <div className="bg-white rounded p-2">
-                              <div className="grid grid-cols-2 gap-1 mb-1">
-                                <div className="aspect-square rounded bg-gradient-to-br from-[#fde68a] to-[#f59e0b]"></div>
-                                <div className="aspect-square rounded bg-gradient-to-br from-[${caseStudy.tabletColors[1]}]"></div>
-                              </div>
-                              <div className="h-1.5 bg-[#f0f2f5] rounded"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Carousel nav */}
-              <div className="flex gap-3 justify-center mt-8">
-                <button
-                  onClick={() => slideCase(-1)}
-                  className="w-[42px] h-[42px] rounded-full border-2 border-[#e1e5ec] bg-white text-[18px] text-[#4a5568] flex items-center justify-center case-nav-btn"
-                >
-                  ‹
-                </button>
-                <div className="flex gap-2 items-center mx-3">
-                  {[0, 1].map((i) => (
-                    <div
-                      key={i}
-                      onClick={() => goCase(i)}
-                      className={`w-2 h-2 rounded-full cursor-pointer case-dot ${caseIdx === i ? "active" : "bg-[#e1e5ec]"}`}
-                    ></div>
-                  ))}
-                </div>
-                <button
-                  onClick={() => slideCase(1)}
-                  className="w-[42px] h-[42px] rounded-full border-2 border-[#e1e5ec] bg-white text-[18px] text-[#4a5568] flex items-center justify-center case-nav-btn"
-                >
-                  ›
-                </button>
-              </div>
             </div>
           </div>
         </section>

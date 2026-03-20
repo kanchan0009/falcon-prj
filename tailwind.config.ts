@@ -3,7 +3,8 @@ import type { Config } from "tailwindcss";
 export default {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
@@ -17,8 +18,16 @@ export default {
           "gold-dark": "#ca8a04",
         },
       },
+      screens: {
+        sm: { max: "640px" },
+        md: { max: "900px" },
+        lg: { max: "1024px" },
+        xl: { max: "1280px" },
+      },
       fontFamily: {
         sans: ["var(--font-geist-sans)", "ui-sans-serif"],
+        playfair: ["Playfair Display", "serif"],
+        dm: ["DM Sans", "sans-serif"],
       },
       animation: {
         "fade-in": "fadeIn 1s ease-in-out",

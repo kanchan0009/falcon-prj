@@ -1,198 +1,194 @@
-import { Check } from "lucide-react";
+"use client";
 
-const plans = [
-  {
-    name: "CredoLite",
-    price: "$374",
-    desc: "Starter Plan",
-    features: [
-      "SDK (Android/iOS/Web)",
-      "Dedicated cloud environment",
-      "Credo360 monthly report",
-      "Web dashboard / API",
-      "Training & support",
-    ],
-  },
-  {
-    name: "CredoOne",
-    price: "$624",
-    desc: "Starter + Add-on",
-    features: [
-      "Device intelligence",
-      "Fraud intelligence",
-      "Apps intelligence",
-      "Behavioural intelligence",
-    ],
-  },
-  {
-    name: "CredoScore",
-    price: "Contact Sales",
-    desc: "Advanced Add-on",
-    features: [
-      "Custom scorecard",
-      "Performance calibration",
-      "Production scoring API",
-    ],
-  },
-];
+import { useEffect } from "react";
 
-export default function PricingPage() {
+export default function ConsultantPage() {
+  const handleClick = (e: React.MouseEvent) => {
+    const target = e.currentTarget as HTMLElement;
+    document
+      .querySelectorAll(".page-btn:not(.nav)")
+      .forEach((b: Element) => b.classList.remove("active"));
+
+    if (!target.classList.contains("nav")) {
+      target.classList.add("active");
+    }
+  };
+
+  useEffect(() => {
+    const cards = document.querySelectorAll(".card");
+    const delays = [0, 0.1, 0.2, 0.1, 0.2, 0.3, 0.2, 0.3, 0.4];
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const card = entry.target as HTMLElement;
+          if (entry.isIntersecting) {
+            const safeIndex = parseInt(card.dataset.index || "0");
+            card.classList.add("visible");
+            card.style.setProperty("--delay", `${delays[safeIndex] || 0}s`);
+
+            observer.unobserve(card);
+          }
+        });
+      },
+      { threshold: 0.1 },
+    );
+
+    cards.forEach((c, index) => {
+      (c as HTMLElement).dataset.index = index.toString();
+      observer.observe(c);
+    });
+
+    // Pagination listeners
+    document.querySelectorAll(".page-btn").forEach((btn) => {
+      btn.addEventListener("click", handleClick as any);
+    });
+
+    return () => {
+      observer.disconnect();
+      document.querySelectorAll(".page-btn").forEach((btn) => {
+        btn.removeEventListener("click", handleClick as any);
+      });
+    };
+  }, []);
+
+  const testimonials = [
+    {
+      name: "Dr. Sarah Johnson",
+      role: "Senior Strategy Consultant",
+      img: "https://randomuser.me/api/portraits/women/44.jpg",
+    },
+    {
+      name: "Michael Chen",
+      role: "Technology Consultant",
+      img: "https://randomuser.me/api/portraits/men/39.jpg",
+    },
+    {
+      name: "Elena Rodriguez",
+      role: "Financial Advisor",
+      img: "https://randomuser.me/api/portraits/women/28.jpg",
+    },
+    {
+      name: "David Kim",
+      role: "Operations Consultant",
+      img: "https://randomuser.me/api/portraits/men/51.jpg",
+    },
+    {
+      name: "Lisa Wong",
+      role: "HR Consultant",
+      img: "https://randomuser.me/api/portraits/women/33.jpg",
+    },
+    {
+      name: "Robert Taylor",
+      role: "Marketing Strategist",
+      img: "https://randomuser.me/api/portraits/men/46.jpg",
+    },
+    {
+      name: "Aisha Patel",
+      role: "Business Analyst",
+      img: "https://randomuser.me/api/portraits/women/29.jpg",
+    },
+    {
+      name: "James Wilson",
+      role: "Risk Management Expert",
+      img: "https://randomuser.me/api/portraits/men/55.jpg",
+    },
+    {
+      name: "Maria Garcia",
+      role: "Digital Transformation Lead",
+      img: "https://randomuser.me/api/portraits/women/37.jpg",
+    },
+  ];
+
   return (
-    <main className="bg-white min-h-screen">
-      
+    <>
+      {/* GLOBAL STYLES */}
+      <style jsx global>{`
+        @keyframes cardEntrance {
+          from {
+            opacity: 0;
+            transform: translateY(50px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
 
-      {/* HERO */}
-      <section className="text-center py-16 px-6">
-        <h2 className="text-5xl text-amber-500  font-bold text-navy">PRICING</h2>
-        <p className="mt-4 text-black max-w-2xl mx-auto">
-          Explore our modular subscription plans designed to help your business
-          take full advantage of behavioural analytics.
-        </p>
+        .card.visible {
+          animation: cardEntrance 0.6s ease forwards;
+          animation-delay: var(--delay, 0s);
+        }
 
-        {/* TOGGLE */}
-        <div className="mt-8 flex justify-center">
-          <div className="bg-amber-500  rounded-full p-1 flex">
-            <button className="bg-orange text-white px-6 py-2 rounded-full">
-              Billed Monthly
+        .star {
+          transition: opacity 0.3s;
+        }
+
+        .card.visible .star {
+          opacity: 1;
+        }
+      `}</style>
+
+      <div className="bg-[#fafaf8] text-[#3d3d5c] min-h-screen">
+        {/* HERO */}
+        <div className="bg-gradient-to-br from-[#1a1a2e] to-[#4a2020] px-10 py-16 text-white">
+          <p className="uppercase tracking-[3px] text-sm text-[#f4a89f]">
+            Consultants
+          </p>
+          <h1 className="text-4xl font-bold mt-2">
+            Our Expert <span className="text-[#f4a89f]">Consultants</span>
+          </h1>
+        </div>
+
+        {/* GRID */}
+        <div className="max-w-[1100px] mx-auto px-6 py-12">
+          <div className="grid grid-cols-3 gap-6 md:grid-cols-2 sm:grid-cols-1">
+            {testimonials.map((t, index) => (
+              <div
+                key={index}
+                className="card bg-white p-6 rounded-xl shadow-lg opacity-0 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl"
+              >
+                {/* Stars */}
+                <div className="flex mb-3">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className="star opacity-0">
+                      ⭐
+                    </span>
+                  ))}
+                </div>
+
+                {/* Expertise */}
+                <p className="text-sm text-gray-500 mb-4">
+                  Expert in delivering transformative business solutions with
+                  proven track record.
+                </p>
+
+                {/* Profile */}
+                <div className="flex items-center gap-3 mt-4">
+                  <img
+                    src={t.img}
+                    alt={t.name}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                  <div>
+                    <p className="font-medium">{t.name}</p>
+                    <p className="text-sm text-[#f4a89f]">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* PAGINATION */}
+          <div className="flex justify-center gap-2 mt-10">
+            <button className="page-btn px-3 py-1 border rounded">1</button>
+            <button className="page-btn active px-3 py-1 border rounded bg-[#e8736a] text-white">
+              2
             </button>
-            <button className="px-6 py-2 text-navy">Billed Yearly</button>
+            <button className="page-btn px-3 py-1 border rounded">3</button>
           </div>
         </div>
-      </section>
-
-      {/* PRICING CARDS */}
-      <section className="grid md:grid-cols-3 gap-8 px-6 md:px-20 pb-20">
-        {plans.map((plan, i) => (
-          <div
-            key={i}
-            className="bg-white rounded-2xl shadow-lg p-8 text-center border"
-          >
-            <h3 className="text-2xl font-bold text-gray-700">{plan.name}</h3>
-            <p className="text-sm text-gray-500">{plan.desc}</p>
-
-            <div className="mt-6 text-4xl font-bold text-amber-700">
-              {plan.price}
-            </div>
-
-            <button className="mt-6 w-full bg-amber-500 text-white py-3 rounded-lg">
-              Contact
-            </button>
-
-            <ul className="mt-6 space-y-3 text-sm text-gray-900">
-              {plan.features.map((f, idx) => (
-                <li
-                  key={idx}
-                  className="flex items-center gap-2 justify-center"
-                >
-                  <Check size={16} className="text-orange" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
-
-      {/* COMPARISON TABLE */}
-      <section className="px-6 md:px-20 pb-20">
-        <h3 className="text-2xl font-bold text-black mb-6">Compare plans</h3>
-
-        <div className="overflow-x-auto">
-          <table className="w-full border rounded-lg overflow-hidden">
-            <thead className="bg-blue-500 text-white">
-              <tr>
-                <th className="p-4 text-left">Features</th>
-                <th>CredoLite</th>
-                <th>CredoOne</th>
-                <th>CredoScore</th>
-              </tr>
-            </thead>
-
-            <tbody className="bg-blue-50 text-gray-900">
-              {[
-                "SDK",
-                "Cloud Environment",
-                "Monthly Report",
-                "Dashboard/API",
-                "Support",
-                "Production API",
-                "Device Intelligence",
-                "Fraud Intelligence",
-              ].map((feature, i) => (
-                <tr key={i} className="border-t text-center">
-                  <td className="p-4 text-left">{feature}</td>
-                  <td>
-                    <Check className="mx-auto text-orange" />
-                  </td>
-                  <td>
-                    <Check className="mx-auto text-orange" />
-                  </td>
-                  <td>
-                    <Check className="mx-auto text-orange" />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="px-6 md:px-20 pb-20">
-        <div className="bg-amber-500 text-white rounded-2xl p-10 flex flex-col md:flex-row justify-between items-center">
-          <div>
-            <h4 className="text-2xl font-bold">How can you trust us?</h4>
-            <p className="text-white mt-2">
-              Check this out and contact us if you still have questions.
-            </p>
-          </div>
-
-          <div className="flex gap-4 mt-6 md:mt-0">
-            <button className="bg-white text-gray-600 px-6 py-3 rounded-lg">
-              Trust Centre
-            </button>
-            <button className="border border-white px-6 py-3 rounded-lg">
-              Book a Meeting
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="bg-navy text-white px-6 md:px-20 py-12">
-        <div className="grid md:grid-cols-5 gap-6 text-sm">
-          <div>
-            <h5 className="font-bold mb-2">credolab</h5>
-          </div>
-
-          <div>
-            <h5 className="font-semibold mb-2">Risk</h5>
-            <p>Risk Scores</p>
-            <p>Insights</p>
-          </div>
-
-          <div>
-            <h5 className="font-semibold mb-2">Fraud</h5>
-            <p>Fraud Scores</p>
-            <p>Insights</p>
-          </div>
-
-          <div>
-            <h5 className="font-semibold mb-2">Marketing</h5>
-            <p>Marketing Scores</p>
-          </div>
-
-          <div>
-            <h5 className="font-semibold mb-2">Support</h5>
-            <p>Contact</p>
-            <p>Docs</p>
-          </div>
-        </div>
-
-        <div className="mt-10 text-center text-gray-400 text-xs">
-          © All rights reserved.
-        </div>
-      </footer>
-    </main>
+      </div>
+    </>
   );
 }
