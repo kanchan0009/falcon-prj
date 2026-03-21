@@ -990,7 +990,7 @@ export default function FalconTechAbout() {
             </div>
             <Link
               href="#"
-              className="sr btn-orange inline-flex items-center gap-2 bg-[#f97316] text-white px-7 py-3 rounded-full text-[13px] font-bold tracking-[0.04em] no-underline transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-[0_6px_24px_rgba(249,115,22,0.35)] hover:bg-[#ea6500] hover:-translate-y-0.5 hover:shadow-[0_10px_32px_rgba(249,115,22,0.45)] flex-shrink-0 self-center lg:mt-5"
+              className="sr w-[200px] btn-orange inline-flex items-center gap-2 bg-[#f97316] text-white px-7 py-3 rounded-full text-[13px] font-bold tracking-[0.04em] no-underline transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-[0_6px_24px_rgba(249,115,22,0.35)] hover:bg-[#ea6500] hover:-translate-y-0.5 hover:shadow-[0_10px_32px_rgba(249,115,22,0.45)] flex-shrink-0 self-center lg:mt-5"
             >
               View All Services
               <svg
@@ -1010,15 +1010,15 @@ export default function FalconTechAbout() {
             {services.map((service, i) => (
               <div
                 key={i}
-                className={`sr ${service.delay} service-card relative rounded-[20px] p-8 border overflow-hidden cursor-default transition-all duration-[0.4s] ease-[cubic-bezier(0.16,1,0.3,1)] ${service.featured ? "bg-[#f97316] border-[#f97316] featured" : "bg-white/[0.04] border-white/[0.07]"}`}
+                className={`sr ${service.delay} service-card relative rounded-[20px] p-8 border overflow-hidden cursor-default transition-all duration-[0.4s] ease-[cubic-bezier(0.16,1,0.3,1)] ${service.featured ? " featured" : "border-white/[0.07]: border-white/[0.07]"}`}
               >
                 <div
-                  className={`font-playfair absolute top-5 right-6 text-[38px] font-extrabold leading-none ${service.featured ? "text-white/[0.18]" : "text-white/[0.06]"}`}
+                  className={`font-playfair absolute top-5 right-6 text-[38px] font-extrabold leading-none ${service.featured ? "text-white/[0.06]" : "text-white/[0.06]"}`}
                 >
                   {service.num}
                 </div>
                 <div
-                  className={`w-[50px] h-[50px] rounded-xl flex items-center justify-center text-[22px] mb-5 transition-transform duration-[0.4s] ease-[cubic-bezier(0.34,1.56,0.64,1)] sc-icon-wrap ${service.featured ? "bg-white/[0.15]" : "bg-[rgba(249,115,22,0.12)]"}`}
+                  className={`w-[50px] h-[50px] rounded-xl flex items-center justify-center text-[22px] mb-5 transition-transform duration-[0.4s] ease-[cubic-bezier(0.34,1.56,0.64,1)] sc-icon-wrap ${service.featured ? " featured" : "bg-white/[0.04]: border-white/[0.07]"}`}
                 >
                   {service.icon}
                 </div>
@@ -1028,13 +1028,13 @@ export default function FalconTechAbout() {
                   {service.title}
                 </div>
                 <div
-                  className={`text-[13px] font-normal leading-[1.75] ${service.featured ? "text-white/80" : "text-white/50"}`}
+                  className={`text-[13px] font-normal leading-[1.75] ${service.featured ? "text-white/50" : "text-white/50"}`}
                 >
                   {service.body}
                 </div>
                 <Link
                   href="#"
-                  className={`inline-flex items-center gap-1.5 mt-5 text-xs font-bold tracking-[0.04em] transition-[gap] duration-300 sc-link ${service.featured ? "text-white/90" : "text-[#f97316]"}`}
+                  className={`inline-flex items-center gap-1.5 mt-5 text-xs font-bold tracking-[0.04em] transition-[gap] duration-300 sc-link ${service.featured ? "text-[#f97316]" : "text-[#f97316]"}`}
                 >
                   Learn More →
                 </Link>

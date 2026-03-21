@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 /* ================= NAV ITEMS ================= */
 const navItems = ["Services", "Portfolio", "Careers", "Contact", "About"];
@@ -10,14 +11,17 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="w-full bg-white shadow-md relative z-50">
+    <nav className="w-full bg-gradient shadow-md relative z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        {/* LOGO */}
-        <Link
-          href="/"
-          className="text-2xl font-bold text-[#0B1F3A] flex items-center gap-1"
-        >
-          <span className="text-[#F97316]">●</span> FALCON
+        <Link href="/" className="flex items-center gap-2">
+          <Image
+            src="/image0.jpeg" // 👈 put your logo inside public folder
+            alt="Falcon Logo"
+            width={40}
+            height={40}
+            className="object-contain"
+          />
+          <span className="text-2xl font-bold text-[#78772d]">FALCON</span>
         </Link>
 
         {/* DESKTOP NAV */}
@@ -38,7 +42,7 @@ export default function Navbar() {
                           ? "/portfolio"
                           : "/"
               }
-              className="text-[#0B1F3A] font-medium hover:text-[#F97316] transition"
+              className="text-[#7d7c32] font-medium hover:text-[white] transition"
             >
               {item}
             </Link>
